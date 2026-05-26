@@ -59,7 +59,7 @@ const DISCUSSION_SECTIONS = [
     content: [
       {
         type: "text",
-        text: 'Phishing is a type of social engineering cyberattack where an attacker disguises themselves as a trustworthy entity — a bank, a tech company, a colleague — to deceive victims into revealing sensitive information such as passwords, credit card numbers, or personal identification. The term "phishing" is a deliberate misspelling of "fishing," reflecting how attackers cast wide digital nets hoping victims will take the bait.',
+        text: 'Phishing is a type of social engineering cyberattack where an attacker disguises themselves as a trustworthy entity a bank, a tech company, a colleague to deceive victims into revealing sensitive information such as passwords, credit card numbers, or personal identification. The term "phishing" is a deliberate misspelling of "fishing," reflecting how attackers cast wide digital nets hoping victims will take the bait.',
       },
       {
         type: "text",
