@@ -764,9 +764,7 @@ function AboutPage() {
         {/* Content column */}
         <div className="about-content">
           <div className="about-intro-block">
-            <h2 className="about-heading">
-              Hello, I'm a Cybersecurity Enthusiast
-            </h2>
+            <h2 className="about-heading">Hello, I'm Kirt Dave Galgo</h2>
             <p>
               I'm a student passionate about understanding the digital threats
               that shape our connected world. This website was created as part
