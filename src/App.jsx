@@ -811,7 +811,7 @@ function AboutPage() {
             <h3>Why This Topic?</h3>
             <p>
               Phishing was chosen because it represents something unique in
-              cybersecurity — it is not a failure of machines but a failure of
+              cybersecurity it is not a failure of machines but a failure of
               trust. By studying how attackers exploit human psychology, we gain
               insight into not just how to defend ourselves digitally, but how
               to think more critically in every aspect of life. Awareness is the
