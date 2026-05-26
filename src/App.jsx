@@ -1,0 +1,1867 @@
+import { useState } from "react";
+
+const NAV_LINKS = ["Home", "Discussion", "Articles", "Reflection", "About"];
+
+const ARTICLES = [
+  {
+    title:
+      "Phishing Attacks Surge 58% in 2024, Targeting Financial Institutions",
+    source: "The Hacker News",
+    date: "March 12, 2024",
+    url: "https://thehackernews.com",
+    summary:
+      "A new report from Zscaler ThreatLabz reveals a dramatic 58% year-over-year spike in phishing attacks, with financial services, retail, and technology sectors bearing the brunt of malicious campaigns using AI-generated lures.",
+    tag: "Report",
+  },
+  {
+    title: "Google and Meta Duped Out of $100 Million in Phishing Scam",
+    source: "Forbes",
+    date: "April 27, 2017",
+    url: "https://www.forbes.com",
+    summary:
+      "Lithuanian national Evaldas Rimasauskas orchestrated a sophisticated Business Email Compromise (BEC) phishing scheme that tricked two of the world's biggest tech companies into wiring over $100 million to fraudulent bank accounts.",
+    tag: "Case Study",
+  },
+  {
+    title: "FBI: Phishing Was the #1 Cybercrime in 2023",
+    source: "FBI Internet Crime Report",
+    date: "February 2024",
+    url: "https://www.ic3.gov",
+    summary:
+      "The FBI's annual Internet Crime Report ranked phishing as the most reported cybercrime for the fifth consecutive year, with over 298,000 complaints filed in 2023 alone and losses exceeding $18 million.",
+    tag: "Statistics",
+  },
+  {
+    title:
+      "AI-Powered Phishing Emails Now Nearly Indistinguishable from Real Ones",
+    source: "Wired",
+    date: "January 2025",
+    url: "https://www.wired.com",
+    summary:
+      "Researchers at IBM and Harvard warn that large language models are enabling threat actors to craft hyper-personalized spear-phishing emails at scale, with detection rates falling to a historic low among corporate employees.",
+    tag: "AI Threat",
+  },
+  {
+    title: "Ukraine Conflict Spurs Surge in State-Sponsored Phishing Campaigns",
+    source: "Reuters",
+    date: "May 3, 2022",
+    url: "https://www.reuters.com",
+    summary:
+      "Google's Threat Analysis Group reported a sharp rise in government-backed phishing operations linked to the Russia-Ukraine war, targeting Ukrainian officials, European governments, and defense organizations with credential-harvesting emails.",
+    tag: "Geopolitics",
+  },
+];
+
+const DISCUSSION_SECTIONS = [
+  {
+    icon: "🎣",
+    title: "What Is Phishing?",
+    content: [
+      {
+        type: "text",
+        text: 'Phishing is a type of social engineering cyberattack where an attacker disguises themselves as a trustworthy entity — a bank, a tech company, a colleague — to deceive victims into revealing sensitive information such as passwords, credit card numbers, or personal identification. The term "phishing" is a deliberate misspelling of "fishing," reflecting how attackers cast wide digital nets hoping victims will take the bait.',
+      },
+      {
+        type: "text",
+        text: "Unlike brute-force attacks that target systems directly, phishing exploits the most vulnerable component of any security system: human psychology. Attackers manipulate emotions like urgency, fear, greed, and trust to override rational decision-making.",
+      },
+    ],
+  },
+  {
+    icon: "📜",
+    title: "A Brief History",
+    content: [
+      {
+        type: "text",
+        text: "Phishing dates back to the mid-1990s when AOL was the dominant internet provider. Hackers posed as AOL staff to steal user credentials — the term 'phishing' first appeared in 1996 in a hacker newsgroup. By the early 2000s, phishing had evolved to target banks and e-commerce sites.",
+      },
+      {
+        type: "text",
+        text: "The 2003–2005 era saw the rise of large-scale phishing kits sold on underground forums. The 2010s introduced spear-phishing and whaling (targeting executives). By 2020, COVID-19 became the most exploited phishing lure in history. Today, AI-generated phishing emails are nearly indistinguishable from legitimate communications.",
+      },
+    ],
+  },
+  {
+    icon: "🕵️",
+    title: "Types of Phishing Attacks",
+    content: [
+      {
+        type: "list",
+        items: [
+          {
+            term: "Email Phishing",
+            def: "The classic form; mass emails impersonating banks, government agencies, or services like PayPal and Netflix with malicious links or attachments.",
+          },
+          {
+            term: "Spear Phishing",
+            def: "Highly targeted attacks customized for a specific individual using personal information gathered from social media or data breaches.",
+          },
+          {
+            term: "Whaling",
+            def: 'Targets high-profile executives or decision-makers (the "big fish"), often impersonating legal or regulatory authorities.',
+          },
+          {
+            term: "Smishing (SMS Phishing)",
+            def: "Fraudulent text messages urging recipients to click links or call fake numbers.",
+          },
+          {
+            term: "Vishing (Voice Phishing)",
+            def: "Phone calls impersonating bank fraud departments, tech support, or government agencies.",
+          },
+          {
+            term: "Clone Phishing",
+            def: "A legitimate email is duplicated with malicious links replacing the real ones, then sent from a spoofed address.",
+          },
+          {
+            term: "Pharming",
+            def: "DNS manipulation that silently redirects users from real websites to fake look-alike pages without any suspicious link being clicked.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    icon: "⚙️",
+    title: "How Phishing Works: A Real Example",
+    content: [
+      {
+        type: "text",
+        text: "Consider a spear-phishing attack on a company employee named Maria:",
+      },
+      {
+        type: "steps",
+        items: [
+          {
+            step: "Reconnaissance",
+            desc: "The attacker scrapes Maria's LinkedIn profile, learns her company, her manager's name (David), and that she handles invoice payments.",
+          },
+          {
+            step: "Crafting the Lure",
+            desc: 'The attacker composes an email appearing to come from "david.smith@company-corp.net" (note: fake domain) saying: "Hi Maria — urgent, please process this vendor invoice by EOD."',
+          },
+          {
+            step: "Delivery",
+            desc: "Maria receives the email. The spoofed sender name matches her real manager. The urgency triggers immediate action.",
+          },
+          {
+            step: "Exploitation",
+            desc: "The PDF contains a macro that installs a keylogger, or the link leads to a fake Microsoft 365 login page harvesting her credentials.",
+          },
+          {
+            step: "Exfiltration",
+            desc: "Within hours, the attacker logs into company systems using Maria's stolen credentials, pivoting to financial accounts or sensitive data.",
+          },
+        ],
+      },
+      {
+        type: "text",
+        text: "This entire chain can unfold in under 24 hours, and the attacker never needed to touch a single firewall.",
+      },
+    ],
+  },
+  {
+    icon: "🛡️",
+    title: "How to Protect Yourself",
+    content: [
+      {
+        type: "list",
+        items: [
+          {
+            term: "Verify Sender Addresses",
+            def: 'Always check the full email address, not just the display name. "Apple Support" can hide "noreply@apple-security-update.xyz."',
+          },
+          {
+            term: "Never Click Unsolicited Links",
+            def: "Go directly to websites by typing URLs in your browser instead of clicking email links.",
+          },
+          {
+            term: "Enable MFA",
+            def: "Even if credentials are stolen, Multi-Factor Authentication prevents unauthorized access.",
+          },
+          {
+            term: "Check for HTTPS — But Don't Trust It Blindly",
+            def: "Phishing sites increasingly use SSL certificates to appear legitimate.",
+          },
+          {
+            term: "Use Anti-Phishing Extensions",
+            def: "Tools like Google Safe Browsing and built-in browser warnings flag known phishing domains.",
+          },
+          {
+            term: "Security Awareness Training",
+            def: "Regular phishing simulations at organizations reduce successful attack rates by up to 70%.",
+          },
+          {
+            term: "Report Suspicious Emails",
+            def: "Forward phishing attempts to your IT department or to phishing@reportphishing.anti-phishing.org.",
+          },
+        ],
+      },
+    ],
+  },
+];
+
+// ── Glitch Text ──────────────────────────────────────────────────────────────
+function GlitchText({ text }) {
+  return (
+    <span className="glitch-text" data-text={text}>
+      {text}
+    </span>
+  );
+}
+
+// ── NavBar ───────────────────────────────────────────────────────────────────
+function NavBar({ active, setActive }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleNav = (link) => {
+    setActive(link);
+    setMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <nav className="nav-bar">
+      <div className="nav-inner">
+        <button className="nav-logo" onClick={() => handleNav("Home")}>
+          <span className="logo-bracket">[</span>
+          PHISH<span className="logo-accent">WATCH</span>
+          <span className="logo-bracket">]</span>
+        </button>
+        <ul className="nav-links-desktop">
+          {NAV_LINKS.map((link, i) => (
+            <li key={link}>
+              <button
+                className={`nav-link ${active === link ? "nav-link-active" : ""}`}
+                onClick={() => handleNav(link)}
+              >
+                {link}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <button
+          className="hamburger"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span className={menuOpen ? "ham-open" : ""}></span>
+          <span className={menuOpen ? "ham-open" : ""}></span>
+          <span className={menuOpen ? "ham-open" : ""}></span>
+        </button>
+      </div>
+      {menuOpen && (
+        <ul className="nav-mobile-menu">
+          {NAV_LINKS.map((link) => (
+            <li key={link}>
+              <button
+                className={`nav-link-mobile ${active === link ? "nav-link-active" : ""}`}
+                onClick={() => handleNav(link)}
+              >
+                {link}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </nav>
+  );
+}
+
+// ── Footer ───────────────────────────────────────────────────────────────────
+function Footer({ setActive }) {
+  return (
+    <footer className="footer">
+      <div className="footer-inner">
+        <div className="footer-brand">
+          <span className="logo-bracket">[</span>PHISH
+          <span className="logo-accent">WATCH</span>
+          <span className="logo-bracket">]</span>
+          <p>
+            A cybersecurity awareness project focused on understanding and
+            preventing phishing attacks.
+          </p>
+        </div>
+        <div className="footer-links">
+          <span className="footer-links-title">Navigation</span>
+          {NAV_LINKS.map((link) => (
+            <button
+              key={link}
+              className="footer-link"
+              onClick={() => {
+                setActive(link);
+                window.scrollTo({ top: 0 });
+              }}
+            >
+              {link}
+            </button>
+          ))}
+        </div>
+        <div className="footer-note">
+          <span className="footer-links-title">Topic</span>
+          <p>Phishing — Social Engineering & Cyber Deception</p>
+          <p style={{ marginTop: "0.5rem" }}>Created for Academic Purposes</p>
+        </div>
+      </div>
+      <div className="footer-bottom">
+        <span>© 2025 PhishWatch — Cybersecurity Awareness Project</span>
+        <span className="footer-tag">// STAY VIGILANT. STAY SAFE.</span>
+      </div>
+    </footer>
+  );
+}
+
+// ── Home Page ────────────────────────────────────────────────────────────────
+function HomePage({ setActive }) {
+  return (
+    <div className="page">
+      {/* Hero */}
+      <section className="hero-section">
+        <div className="hero-badge">⚠ CYBERSECURITY AWARENESS PROJECT</div>
+        <h1 className="hero-title">
+          <GlitchText text="PHISHING" />
+          <br />
+          <span className="hero-sub">The Art of Digital Deception</span>
+        </h1>
+        <p className="hero-desc">
+          Phishing is one of the oldest and most effective cyberattacks in
+          existence. By exploiting human trust rather than technical
+          vulnerabilities, attackers trick individuals into surrendering
+          passwords, financial data, and sensitive information — with
+          devastating consequences.
+        </p>
+        <div className="hero-stats">
+          {[
+            { num: "3.4B", label: "Phishing emails sent daily" },
+            { num: "36%", label: "Of data breaches involve phishing" },
+            { num: "$17.7M", label: "Avg. annual cost per organization" },
+          ].map(({ num, label }) => (
+            <div className="stat-card" key={num}>
+              <span className="stat-num">{num}</span>
+              <span className="stat-label">{label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="hero-btns">
+          <button
+            className="btn-primary"
+            onClick={() => setActive("Discussion")}
+          >
+            Explore Topic →
+          </button>
+          <button
+            className="btn-secondary"
+            onClick={() => setActive("Articles")}
+          >
+            Read Articles
+          </button>
+        </div>
+      </section>
+
+      {/* Summary Cards */}
+      <section className="section">
+        <h2 className="section-title">Topic Overview</h2>
+        <div className="card-grid-3">
+          {[
+            {
+              icon: "🎣",
+              title: "What It Is",
+              body: "A social engineering attack that impersonates trusted entities to steal sensitive data through deceptive messages, links, and attachments.",
+            },
+            {
+              icon: "⚠️",
+              title: "Why It's Dangerous",
+              body: "Phishing bypasses all technical defenses by targeting humans. No firewall, antivirus, or encryption can fully patch human psychology.",
+            },
+            {
+              icon: "🛡️",
+              title: "How to Stay Safe",
+              body: "Awareness, MFA, vigilant email habits, and security training are your strongest shields against phishing attacks.",
+            },
+          ].map(({ icon, title, body }) => (
+            <div className="summary-card" key={title}>
+              <span className="summary-icon">{icon}</span>
+              <h3>{title}</h3>
+              <p>{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Timeline */}
+      <section className="section">
+        <h2 className="section-title">Evolution of Phishing</h2>
+        <div className="timeline">
+          {[
+            {
+              year: "1996",
+              event:
+                'Term "phishing" coined in AOL hacker newsgroups; criminals posed as AOL staff to steal credentials.',
+            },
+            {
+              year: "2003",
+              event:
+                "First large-scale bank phishing campaigns emerge, targeting PayPal and eBay users worldwide.",
+            },
+            {
+              year: "2011",
+              event:
+                "Spear-phishing attacks hit RSA Security and major US defense contractors, compromising SecurID tokens.",
+            },
+            {
+              year: "2016",
+              event:
+                "John Podesta's email phished via a fake Google security alert, influencing the US presidential election.",
+            },
+            {
+              year: "2020",
+              event:
+                "COVID-19 becomes the most exploited phishing lure in history; WHO and CDC impersonated globally.",
+            },
+            {
+              year: "2024",
+              event:
+                "AI-generated phishing emails become nearly undetectable, with LLMs enabling personalized attacks at scale.",
+            },
+          ].map(({ year, event }) => (
+            <div className="timeline-item" key={year}>
+              <div className="timeline-year">{year}</div>
+              <div className="timeline-line">
+                <span className="timeline-dot"></span>
+              </div>
+              <div className="timeline-event">{event}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Quick Tips */}
+      <section className="section">
+        <h2 className="section-title">Quick Protection Tips</h2>
+        <div className="tips-grid">
+          {[
+            {
+              icon: "🔍",
+              tip: "Always verify sender email addresses — not just display names.",
+            },
+            {
+              icon: "🔐",
+              tip: "Enable Multi-Factor Authentication on all important accounts.",
+            },
+            {
+              icon: "🚫",
+              tip: "Never click links in unsolicited emails — navigate directly.",
+            },
+            {
+              icon: "📞",
+              tip: "Call back using official numbers if asked to act urgently.",
+            },
+            {
+              icon: "🔄",
+              tip: "Keep software and browsers updated to patch security holes.",
+            },
+            {
+              icon: "🎓",
+              tip: "Participate in security awareness training at your organization.",
+            },
+          ].map(({ icon, tip }) => (
+            <div className="tip-card" key={tip}>
+              <span className="tip-icon">{icon}</span>
+              <p>{tip}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ── Discussion Page ──────────────────────────────────────────────────────────
+function DiscussionPage() {
+  const [open, setOpen] = useState(0);
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <div className="page-tag"></div>
+        <h1 className="page-title">
+          Deep Dive: <span className="accent">Phishing</span>
+        </h1>
+        <p className="page-intro">
+          A comprehensive breakdown of phishing — its mechanics, history,
+          variants, real-world examples, and how to defend against it.
+        </p>
+      </div>
+
+      {/* Accordion */}
+      <div className="accordion">
+        {DISCUSSION_SECTIONS.map((sec, i) => (
+          <div
+            key={i}
+            className={`accordion-item ${open === i ? "acc-open" : ""}`}
+          >
+            <button
+              className="acc-header"
+              onClick={() => setOpen(open === i ? -1 : i)}
+            >
+              <span className="acc-icon">{sec.icon}</span>
+              <span className="acc-title">{sec.title}</span>
+              <span className="acc-chevron">{open === i ? "▲" : "▼"}</span>
+            </button>
+            {open === i && (
+              <div className="acc-body">
+                {sec.content.map((block, bi) => {
+                  if (block.type === "text") {
+                    return (
+                      <p key={bi} className="disc-text">
+                        {block.text}
+                      </p>
+                    );
+                  }
+                  if (block.type === "list") {
+                    return (
+                      <div key={bi} className="disc-list">
+                        {block.items.map(({ term, def }) => (
+                          <div key={term} className="disc-list-item">
+                            <span className="disc-term">{term}</span>
+                            <span className="disc-def">{def}</span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+                  if (block.type === "steps") {
+                    return (
+                      <div key={bi} className="disc-steps">
+                        {block.items.map(({ step, desc }, si) => (
+                          <div key={step} className="disc-step">
+                            <div className="disc-step-num">{si + 1}</div>
+                            <div>
+                              <strong className="disc-step-title">
+                                {step}
+                              </strong>
+                              <p className="disc-step-desc">{desc}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Phishing Email Anatomy */}
+      <section className="section">
+        <h2 className="section-title">Anatomy of a Phishing Email</h2>
+        <p
+          style={{
+            color: "var(--text-dim)",
+            fontSize: "0.9rem",
+            marginBottom: "1.5rem",
+          }}
+        >
+          Real phishing emails use multiple psychological tricks simultaneously.
+          Here's how to spot them:
+        </p>
+        <div className="email-mock">
+          <div className="email-titlebar">
+            <div className="email-dots">
+              <span style={{ background: "#ff5f57" }}></span>
+              <span style={{ background: "#ffbd2e" }}></span>
+              <span style={{ background: "#28c840" }}></span>
+            </div>
+            <span className="email-titlebar-text">📧 Inbox — Mail Client</span>
+          </div>
+          <div className="email-body">
+            <div className="email-field">
+              <span className="ef-label">From:</span>
+              <span className="ef-danger">security@paypa1-alerts.com</span>
+              <span className="ef-tag ef-red">⚠ SPOOFED DOMAIN</span>
+            </div>
+            <div className="email-field">
+              <span className="ef-label">To:</span>
+              <span className="ef-value">you@youremail.com</span>
+            </div>
+            <div className="email-field">
+              <span className="ef-label">Subject:</span>
+              <span className="ef-danger">
+                URGENT: Your account has been suspended
+              </span>
+              <span className="ef-tag ef-orange">⚠ URGENCY TRIGGER</span>
+            </div>
+            <div className="email-hr"></div>
+            <div className="email-content">
+              <p>Dear Valued Customer,</p>
+              <p>
+                We have detected <strong>unusual activity</strong> on your
+                PayPal account. Your account has been{" "}
+                <strong>temporarily limited</strong>.{" "}
+                <span className="ef-tag ef-orange">⚠ FEAR TRIGGER</span>
+              </p>
+              <p>
+                Please verify your identity <strong>within 24 hours</strong> to
+                avoid permanent suspension.{" "}
+                <span className="ef-tag ef-orange">⚠ FALSE DEADLINE</span>
+              </p>
+              <p>
+                <span className="ef-link">
+                  🔗 Click here to verify your account →
+                </span>{" "}
+                <span className="ef-tag ef-red">⚠ MALICIOUS LINK</span>
+              </p>
+              <p className="email-sig">
+                Best regards,
+                <br />
+                PayPal Security Team
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// ── Articles Page ────────────────────────────────────────────────────────────
+function ArticlesPage() {
+  return (
+    <div className="page">
+      <div className="page-header">
+        <div className="page-tag"></div>
+        <h1 className="page-title">
+          News & <span className="accent">Research</span>
+        </h1>
+        <p className="page-intro">
+          Curated articles and reports from trusted cybersecurity sources
+          documenting the evolving phishing landscape.
+        </p>
+      </div>
+
+      <div className="articles-grid">
+        {ARTICLES.map((a, i) => (
+          <article className="article-card" key={i}>
+            <div className="article-top">
+              <span className="article-tag">{a.tag}</span>
+              <span className="article-num">
+                #{String(i + 1).padStart(2, "0")}
+              </span>
+            </div>
+            <h3 className="article-title">{a.title}</h3>
+            <p className="article-summary">{a.summary}</p>
+            <div className="article-meta">
+              <span>📰 {a.source}</span>
+              <span>🗓 {a.date}</span>
+            </div>
+            <a
+              className="article-link"
+              href={a.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Visit Source →
+            </a>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Reflection Page ──────────────────────────────────────────────────────────
+function ReflectionPage() {
+  const paragraphs = [
+    {
+      num: "01",
+      title: "What Studying Phishing Taught Me",
+      text: "Before I began researching this topic, I thought phishing was simply about fake emails and obvious scams — the kind you can spot from a mile away. But diving deeper revealed something far more unsettling: modern phishing is a sophisticated psychological discipline. Attackers don't just send random spam; they study their targets, mirror their language, and weaponize emotions like urgency and fear. The realization that some of the world's largest corporations — Google and Meta among them — have fallen victim to phishing schemes humbled me. It made me understand that technical knowledge alone doesn't protect you; emotional awareness does. Learning to pause, question, and verify before acting on any digital request is a skill I now treat as essential as any technical literacy.",
+    },
+    {
+      num: "02",
+      title: "The Human Element in Cybersecurity",
+      text: "One of the most striking insights from this study is how phishing exposes the profound gap between technological advancement and human vulnerability. We build firewalls, encryption protocols, and AI-powered threat detection — yet a single well-crafted email bypasses all of it by targeting the person sitting at the keyboard. This forces me to reconsider what 'security' truly means. True security isn't just about the tools we deploy; it's about the culture we build around awareness, skepticism, and shared responsibility. Organizations that invest in regular phishing simulations and employee education consistently report fewer successful attacks, proving that informed humans are the strongest firewall we have. This shift in perspective — from technology-first to people-first — feels like one of the most important lessons cybersecurity has to offer.",
+    },
+    {
+      num: "03",
+      title: "Looking Forward: AI and the Evolving Threat",
+      text: "Perhaps the most alarming development I encountered was the rise of AI-generated phishing. Large language models can now craft hyper-personalized, grammatically perfect, emotionally calibrated phishing messages at industrial scale — eliminating the spelling errors and awkward phrasing that once served as red flags. This arms race between attackers leveraging AI and defenders scrambling to keep up raises a difficult question: can we ever truly 'solve' phishing? My reflection is that we cannot eliminate it entirely, but we can make societies resilient to it. Digital literacy — teaching people of all ages to think critically about what they see online — must become as fundamental as reading and writing. The responsibility doesn't only fall on IT departments; it falls on educators, governments, and each of us as individuals navigating an increasingly deceptive digital world.",
+    },
+  ];
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <div className="page-tag"></div>
+        <h1 className="page-title">
+          Personal <span className="accent">Reflection</span>
+        </h1>
+        <p className="page-intro">
+          Three paragraphs reflecting on the study of phishing — what it
+          revealed, why it matters, and what it means for the future.
+        </p>
+      </div>
+
+      <div className="reflection-quote">
+        "The weakest link in any security system is the human being."
+        <span className="quote-attr">
+          — Kevin Mitnick, former FBI Most Wanted hacker & cybersecurity author
+        </span>
+      </div>
+
+      <div className="reflection-list">
+        {paragraphs.map(({ num, title, text }) => (
+          <div className="reflection-item" key={num}>
+            <div className="reflection-num">{num}</div>
+            <div className="reflection-body">
+              <h3 className="reflection-title">{title}</h3>
+              <p className="reflection-text">{text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── About Page ───────────────────────────────────────────────────────────────
+function AboutPage() {
+  return (
+    <div className="page">
+      <div className="page-header">
+        <div className="page-tag"></div>
+        <h1 className="page-title">
+          About <span className="accent">Me</span>
+        </h1>
+        <p className="page-intro">
+          The person behind this cybersecurity awareness project.
+        </p>
+      </div>
+
+      <div className="about-grid">
+        {/* Avatar column */}
+        <div className="about-avatar-col">
+          <div className="about-avatar">
+            <div className="avatar-inner">
+              <img src="/me.jpg" alt="Profile photo" className="avatar-photo" />
+            </div>
+            <div className="avatar-ring"></div>
+          </div>
+          <div className="status-badge">
+            <span className="status-dot"></span> Student · Researcher
+          </div>
+          <div className="about-skills">
+            {["Cybersecurity", "Research", "Web Dev", "IT Studies"].map((s) => (
+              <span className="skill-tag" key={s}>
+                {s}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Content column */}
+        <div className="about-content">
+          <div className="about-intro-block">
+            <h2 className="about-heading">
+              Hello, I'm a Cybersecurity Enthusiast
+            </h2>
+            <p>
+              I'm a student passionate about understanding the digital threats
+              that shape our connected world. This website was created as part
+              of an academic exploration of cybersecurity topics — with a
+              specific focus on phishing, one of the most persistent and
+              human-centered threats in the field.
+            </p>
+            <p>
+              My interest in cybersecurity grew from a simple realization:
+              technology is only as secure as the people who use it. That
+              intersection of psychology and technology fascinates me, and
+              phishing sits right at the heart of it.
+            </p>
+          </div>
+
+          <div className="about-details">
+            {[
+              {
+                label: "📚 Field of Study",
+                value: "Information Technology / Cybersecurity",
+              },
+              {
+                label: "🎯 Focus Area",
+                value: "Social Engineering & Digital Threats",
+              },
+              {
+                label: "💡 Interests",
+                value: "Network Security, Ethical Hacking, Digital Forensics",
+              },
+              { label: "🌐 Location", value: "Philippines" },
+              {
+                label: "🎓 Project Type",
+                value: "Academic Cybersecurity Awareness Website",
+              },
+            ].map(({ label, value }) => (
+              <div className="detail-row" key={label}>
+                <span className="detail-label">{label}</span>
+                <span className="detail-value">{value}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="about-mission">
+            <h3>Why This Topic?</h3>
+            <p>
+              Phishing was chosen because it represents something unique in
+              cybersecurity — it is not a failure of machines but a failure of
+              trust. By studying how attackers exploit human psychology, we gain
+              insight into not just how to defend ourselves digitally, but how
+              to think more critically in every aspect of life. Awareness is the
+              first and most powerful line of defense, and this project is my
+              contribution to building that awareness.
+            </p>
+          </div>
+
+          <div className="about-contact-note">
+            <span className="contact-icon">💬</span>
+            <p>
+              This site was built as a class project exploring cybersecurity
+              topics. All information is sourced from reputable security
+              organizations and news outlets.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── App Root ─────────────────────────────────────────────────────────────────
+export default function App() {
+  const [active, setActive] = useState("Home");
+
+  const pages = {
+    Home: <HomePage setActive={setActive} />,
+    Discussion: <DiscussionPage />,
+    Articles: <ArticlesPage />,
+    Reflection: <ReflectionPage />,
+    About: <AboutPage />,
+  };
+
+  return (
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,600;0,800;1,400&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+          --bg:        #030a06;
+          --bg2:       #071210;
+          --surface:   #0b1d15;
+          --surface2:  #0f2319;
+          --border:    #163024;
+          --green:     #00ff88;
+          --green-dim: #00cc6a;
+          --green-dk:  #004d28;
+          --accent:    #00e5ff;
+          --warn:      #ffbe00;
+          --danger:    #ff4444;
+          --text:      #c8ffd6;
+          --text-dim:  #4d7a5e;
+          --mono: 'Share Tech Mono', monospace;
+          --head: 'Rajdhani', sans-serif;
+          --body: 'Exo 2', sans-serif;
+          --radius: 8px;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+          background: var(--bg);
+          color: var(--text);
+          font-family: var(--body);
+          min-height: 100vh;
+          line-height: 1.6;
+          background-image:
+            radial-gradient(ellipse 90% 45% at 50% -10%, #003d2255 0%, transparent 60%);
+        }
+
+        /* Scanlines */
+        body::after {
+          content: '';
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          z-index: 9999;
+          background: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0,255,100,0.012) 2px,
+            rgba(0,255,100,0.012) 4px
+          );
+        }
+
+        button { font-family: var(--body); cursor: pointer; }
+        a { text-decoration: none; }
+        img { max-width: 100%; }
+
+        /* ══ NAV ════════════════════════════════════════════════════════════ */
+        .nav-bar {
+          position: sticky;
+          top: 0;
+          z-index: 200;
+          background: rgba(3,10,6,0.93);
+          backdrop-filter: blur(14px);
+          -webkit-backdrop-filter: blur(14px);
+          border-bottom: 1px solid var(--border);
+          box-shadow: 0 2px 24px rgba(0,255,136,0.06);
+        }
+        .nav-inner {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 1.25rem;
+          height: 62px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+        .nav-logo {
+          background: none;
+          border: none;
+          font-family: var(--mono);
+          font-size: 1.1rem;
+          color: var(--green);
+          letter-spacing: 2px;
+          text-shadow: 0 0 14px var(--green);
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .logo-bracket { color: var(--text-dim); }
+        .logo-accent  { color: var(--accent); text-shadow: 0 0 10px var(--accent); }
+
+        .nav-links-desktop {
+          display: flex;
+          list-style: none;
+          gap: 2px;
+        }
+        .nav-link {
+          background: none;
+          border: none;
+          font-family: var(--head);
+          font-size: 0.88rem;
+          font-weight: 600;
+          letter-spacing: 1.2px;
+          text-transform: uppercase;
+          color: var(--text-dim);
+          padding: 0.4rem 0.8rem;
+          border-radius: 4px;
+          transition: color 0.2s, background 0.2s;
+          white-space: nowrap;
+        }
+        .nav-link:hover { color: var(--green); background: rgba(0,255,136,0.06); }
+        .nav-link-active { color: var(--green) !important; background: rgba(0,255,136,0.1) !important; }
+
+
+        .hamburger {
+          display: none;
+          flex-direction: column;
+          gap: 5px;
+          background: none;
+          border: none;
+          padding: 6px;
+          flex-shrink: 0;
+        }
+        .hamburger span {
+          display: block;
+          width: 22px;
+          height: 2px;
+          background: var(--green);
+          border-radius: 2px;
+          transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .nav-mobile-menu {
+          list-style: none;
+          background: var(--bg2);
+          border-top: 1px solid var(--border);
+          padding: 0.5rem 1rem 1rem;
+        }
+        .nav-link-mobile {
+          background: none;
+          border: none;
+          font-family: var(--head);
+          font-size: 1rem;
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: var(--text-dim);
+          padding: 0.65rem 0.75rem;
+          width: 100%;
+          text-align: left;
+          border-radius: 4px;
+          display: block;
+        }
+        .nav-link-mobile:hover,
+        .nav-link-mobile.nav-link-active { color: var(--green); background: rgba(0,255,136,0.07); }
+
+        @media (max-width: 700px) {
+          .nav-links-desktop { display: none; }
+          .hamburger { display: flex; }
+        }
+
+        /* ══ PAGE WRAPPER ═══════════════════════════════════════════════════ */
+        .page {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2.5rem 1.25rem 4rem;
+        }
+        .page-header { margin-bottom: 2.5rem; }
+        .page-tag {
+          font-family: var(--mono);
+          font-size: 0.72rem;
+          letter-spacing: 2.5px;
+          color: var(--accent);
+          margin-bottom: 0.6rem;
+        }
+        .page-title {
+          font-family: var(--head);
+          font-size: clamp(2rem, 5vw, 3.2rem);
+          font-weight: 700;
+          color: var(--text);
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          line-height: 1.1;
+          margin-bottom: 0.85rem;
+        }
+        .accent { color: var(--green); text-shadow: 0 0 18px rgba(0,255,136,0.35); }
+        .page-intro {
+          font-size: 0.97rem;
+          color: var(--text-dim);
+          line-height: 1.75;
+          max-width: 700px;
+        }
+
+        /* Shared section */
+        .section { margin-top: 3.5rem; }
+        .section-title {
+          font-family: var(--head);
+          font-size: 1.25rem;
+          font-weight: 700;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: var(--text);
+          margin-bottom: 1.75rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        .section-title::before {
+          content: '';
+          display: inline-block;
+          width: 28px;
+          height: 2px;
+          background: var(--green);
+          box-shadow: 0 0 8px var(--green);
+          flex-shrink: 0;
+        }
+
+        /* ══ HOME — HERO ════════════════════════════════════════════════════ */
+        .hero-section {
+          text-align: center;
+          padding: 3.5rem 0 2rem;
+        }
+        .hero-badge {
+          display: inline-block;
+          font-family: var(--mono);
+          font-size: 0.68rem;
+          letter-spacing: 3px;
+          color: var(--accent);
+          border: 1px solid rgba(0,229,255,0.4);
+          padding: 0.3rem 1rem;
+          border-radius: 2px;
+          margin-bottom: 1.5rem;
+          text-shadow: 0 0 8px var(--accent);
+        }
+        .hero-title {
+          font-family: var(--head);
+          font-size: clamp(3.5rem, 12vw, 7.5rem);
+          font-weight: 700;
+          line-height: 1;
+          color: var(--green);
+          text-shadow: 0 0 40px rgba(0,255,136,0.5), 0 0 80px rgba(0,255,136,0.15);
+          letter-spacing: 5px;
+          margin-bottom: 0.4rem;
+        }
+        .hero-sub {
+          font-size: clamp(0.85rem, 2.5vw, 1.2rem);
+          color: var(--text-dim);
+          font-weight: 300;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+        }
+        .hero-desc {
+          max-width: 640px;
+          margin: 1.75rem auto;
+          font-size: 1rem;
+          color: var(--text);
+          opacity: 0.75;
+          line-height: 1.85;
+        }
+        .hero-stats {
+          display: flex;
+          justify-content: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+          margin: 2rem 0;
+        }
+        .stat-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.1rem 1.5rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.3rem;
+          min-width: 140px;
+          flex: 1;
+          max-width: 200px;
+        }
+        .stat-num {
+          font-family: var(--mono);
+          font-size: 1.7rem;
+          color: var(--green);
+          text-shadow: 0 0 14px var(--green);
+          font-weight: bold;
+        }
+        .stat-label {
+          font-size: 0.72rem;
+          color: var(--text-dim);
+          text-align: center;
+          letter-spacing: 0.3px;
+          line-height: 1.4;
+        }
+        .hero-btns {
+          display: flex;
+          gap: 0.75rem;
+          justify-content: center;
+          flex-wrap: wrap;
+          margin-top: 0.5rem;
+        }
+        .btn-primary {
+          background: var(--green);
+          color: #030a06;
+          border: none;
+          padding: 0.7rem 1.75rem;
+          font-family: var(--head);
+          font-size: 0.9rem;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          border-radius: 4px;
+          transition: all 0.2s;
+          box-shadow: 0 0 20px rgba(0,255,136,0.3);
+        }
+        .btn-primary:hover {
+          background: var(--green-dim);
+          box-shadow: 0 0 32px rgba(0,255,136,0.5);
+          transform: translateY(-2px);
+        }
+        .btn-secondary {
+          background: transparent;
+          color: var(--green);
+          border: 1px solid var(--green);
+          padding: 0.7rem 1.75rem;
+          font-family: var(--head);
+          font-size: 0.9rem;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          border-radius: 4px;
+          transition: all 0.2s;
+        }
+        .btn-secondary:hover {
+          background: rgba(0,255,136,0.08);
+          box-shadow: 0 0 16px rgba(0,255,136,0.15);
+        }
+
+        /* summary cards */
+        .card-grid-3 {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
+        }
+        .summary-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.5rem;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .summary-card:hover {
+          border-color: var(--green-dk);
+          box-shadow: 0 4px 24px rgba(0,255,136,0.07);
+        }
+        .summary-icon { font-size: 1.6rem; display: block; margin-bottom: 0.65rem; }
+        .summary-card h3 {
+          font-family: var(--head);
+          font-size: 0.9rem;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--green);
+          margin-bottom: 0.5rem;
+        }
+        .summary-card p { font-size: 0.88rem; color: var(--text-dim); line-height: 1.7; }
+
+        /* timeline */
+        .timeline {
+          border-left: 2px solid var(--border);
+          margin-left: 0.75rem;
+          padding-left: 1.75rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+        }
+        .timeline-item {
+          display: grid;
+          grid-template-columns: 58px 1fr;
+          gap: 0.75rem;
+          align-items: flex-start;
+          padding: 0.85rem 0;
+          position: relative;
+        }
+        .timeline-item::before {
+          content: '';
+          position: absolute;
+          left: -1.97rem;
+          top: 1.1rem;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: var(--green);
+          box-shadow: 0 0 8px var(--green);
+          border: 2px solid var(--bg);
+        }
+        .timeline-year {
+          font-family: var(--mono);
+          font-size: 0.82rem;
+          color: var(--green);
+          text-shadow: 0 0 6px var(--green);
+          padding-top: 2px;
+        }
+        .timeline-line { display: none; }
+        .timeline-dot { display: none; }
+        .timeline-event { font-size: 0.9rem; color: var(--text); opacity: 0.78; line-height: 1.6; }
+
+        /* tips */
+        .tips-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
+        }
+        .tip-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.1rem 1.25rem;
+          display: flex;
+          align-items: flex-start;
+          gap: 0.75rem;
+          transition: border-color 0.2s;
+        }
+        .tip-card:hover { border-color: var(--green-dk); }
+        .tip-icon { font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
+        .tip-card p { font-size: 0.86rem; color: var(--text-dim); line-height: 1.65; }
+
+        /* ══ DISCUSSION ═════════════════════════════════════════════════════ */
+        .accordion { display: flex; flex-direction: column; gap: 0.6rem; }
+        .accordion-item {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          overflow: hidden;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .acc-open {
+          border-color: var(--green-dk);
+          box-shadow: 0 0 20px rgba(0,255,136,0.06);
+        }
+        .acc-header {
+          width: 100%;
+          background: none;
+          border: none;
+          padding: 1.1rem 1.25rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          text-align: left;
+        }
+        .acc-icon { font-size: 1.2rem; flex-shrink: 0; }
+        .acc-title {
+          flex: 1;
+          font-family: var(--head);
+          font-size: 0.95rem;
+          font-weight: 700;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: var(--text);
+        }
+        .acc-chevron { font-family: var(--mono); font-size: 0.65rem; color: var(--green); flex-shrink: 0; }
+        .acc-body {
+          padding: 0 1.25rem 1.4rem;
+          border-top: 1px solid var(--border);
+        }
+        .disc-text {
+          font-size: 0.93rem;
+          color: var(--text);
+          opacity: 0.82;
+          line-height: 1.85;
+          margin-top: 1rem;
+        }
+        .disc-list { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.6rem; }
+        .disc-list-item {
+          display: flex;
+          gap: 0.75rem;
+          align-items: baseline;
+          padding: 0.6rem 0.75rem;
+          background: var(--surface2);
+          border-radius: 4px;
+          border-left: 2px solid var(--green-dk);
+          flex-wrap: wrap;
+        }
+        .disc-term {
+          font-family: var(--head);
+          font-size: 0.82rem;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          color: var(--green);
+          text-transform: uppercase;
+          white-space: nowrap;
+          flex-shrink: 0;
+        }
+        .disc-def { font-size: 0.88rem; color: var(--text-dim); line-height: 1.6; }
+        .disc-steps { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem; }
+        .disc-step {
+          display: flex;
+          gap: 1rem;
+          align-items: flex-start;
+          padding: 0.75rem;
+          background: var(--surface2);
+          border-radius: 6px;
+          border: 1px solid var(--border);
+        }
+        .disc-step-num {
+          width: 28px;
+          height: 28px;
+          border-radius: 50%;
+          background: var(--green-dk);
+          color: var(--green);
+          font-family: var(--mono);
+          font-size: 0.78rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+          box-shadow: 0 0 8px rgba(0,255,136,0.15);
+        }
+        .disc-step-title {
+          font-family: var(--head);
+          font-size: 0.85rem;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          color: var(--green);
+          text-transform: uppercase;
+          display: block;
+          margin-bottom: 0.3rem;
+        }
+        .disc-step-desc { font-size: 0.86rem; color: var(--text-dim); line-height: 1.6; margin: 0; }
+
+        /* Email mock */
+        .email-mock {
+          background: #0a1a10;
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          overflow: hidden;
+          max-width: 680px;
+          box-shadow: 0 0 40px rgba(0,0,0,0.5), 0 0 30px rgba(0,255,136,0.04);
+        }
+        .email-titlebar {
+          background: #081208;
+          border-bottom: 1px solid var(--border);
+          padding: 0.55rem 1rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        .email-dots { display: flex; gap: 6px; }
+        .email-dots span { width: 11px; height: 11px; border-radius: 50%; }
+        .email-titlebar-text { font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim); }
+        .email-body { padding: 1.1rem 1.25rem; }
+        .email-field {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.4rem 0.5rem;
+          margin-bottom: 0.4rem;
+          font-family: var(--mono);
+          font-size: 0.8rem;
+        }
+        .ef-label { color: var(--text-dim); min-width: 56px; }
+        .ef-value { color: var(--text); }
+        .ef-danger { color: var(--danger); text-shadow: 0 0 5px rgba(255,68,68,0.4); }
+        .ef-tag {
+          font-size: 0.64rem;
+          padding: 1px 6px;
+          border-radius: 3px;
+          font-weight: 700;
+          letter-spacing: 0.3px;
+          white-space: nowrap;
+        }
+        .ef-red { background: rgba(255,68,68,0.12); color: var(--danger); border: 1px solid rgba(255,68,68,0.25); }
+        .ef-orange { background: rgba(255,190,0,0.1); color: var(--warn); border: 1px solid rgba(255,190,0,0.25); }
+        .email-hr { height: 1px; background: var(--border); margin: 0.75rem 0; }
+        .email-content { font-size: 0.87rem; line-height: 1.8; color: var(--text); opacity: 0.85; }
+        .email-content p { margin-bottom: 0.5rem; }
+        .ef-link { color: var(--accent); text-decoration: underline; }
+        .email-sig { color: var(--text-dim); margin-top: 0.75rem; font-size: 0.82rem; line-height: 1.5; }
+
+        /* ══ ARTICLES ═══════════════════════════════════════════════════════ */
+        .articles-grid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.1rem;
+        }
+        .article-card {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.4rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .article-card:hover {
+          border-color: var(--green-dk);
+          transform: translateY(-3px);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 16px rgba(0,255,136,0.05);
+        }
+        .article-top { display: flex; justify-content: space-between; align-items: center; }
+        .article-tag {
+          font-family: var(--mono);
+          font-size: 0.66rem;
+          letter-spacing: 1px;
+          color: var(--accent);
+          background: rgba(0,229,255,0.07);
+          border: 1px solid rgba(0,229,255,0.18);
+          padding: 2px 8px;
+          border-radius: 3px;
+          text-transform: uppercase;
+        }
+        .article-num { font-family: var(--mono); font-size: 0.7rem; color: var(--text-dim); }
+        .article-title {
+          font-family: var(--head);
+          font-size: 0.98rem;
+          font-weight: 700;
+          color: var(--text);
+          line-height: 1.45;
+        }
+        .article-summary { font-size: 0.84rem; color: var(--text-dim); line-height: 1.7; flex: 1; }
+        .article-meta {
+          display: flex;
+          gap: 1rem;
+          flex-wrap: wrap;
+          font-family: var(--mono);
+          font-size: 0.7rem;
+          color: var(--text-dim);
+        }
+        .article-link {
+          display: inline-block;
+          font-family: var(--head);
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          color: var(--green);
+          border-top: 1px solid var(--border);
+          padding-top: 0.7rem;
+          transition: color 0.2s, letter-spacing 0.2s;
+        }
+        .article-link:hover { color: var(--accent); letter-spacing: 2px; }
+
+        /* ══ REFLECTION ═════════════════════════════════════════════════════ */
+        .reflection-quote {
+          font-family: var(--mono);
+          font-size: 0.95rem;
+          color: var(--green);
+          border-left: 3px solid var(--green);
+          padding: 1.1rem 1.4rem;
+          background: rgba(0,255,136,0.03);
+          border-radius: 0 var(--radius) var(--radius) 0;
+          margin-bottom: 2.5rem;
+          line-height: 1.75;
+          text-shadow: 0 0 8px rgba(0,255,136,0.2);
+        }
+        .quote-attr {
+          display: block;
+          font-size: 0.72rem;
+          color: var(--text-dim);
+          margin-top: 0.5rem;
+          font-style: italic;
+        }
+        .reflection-list { display: flex; flex-direction: column; gap: 2rem; }
+        .reflection-item {
+          display: grid;
+          grid-template-columns: 60px 1fr;
+          gap: 1.5rem;
+          align-items: flex-start;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.5rem;
+        }
+        .reflection-num {
+          font-family: var(--mono);
+          font-size: 2rem;
+          font-weight: 700;
+          color: var(--green-dk);
+          text-shadow: 0 0 16px var(--green-dk);
+          line-height: 1;
+          padding-top: 4px;
+        }
+        .reflection-title {
+          font-family: var(--head);
+          font-size: 1rem;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--green);
+          margin-bottom: 0.65rem;
+        }
+        .reflection-text {
+          font-size: 0.93rem;
+          color: var(--text);
+          opacity: 0.82;
+          line-height: 1.9;
+        }
+
+        /* ══ ABOUT ══════════════════════════════════════════════════════════ */
+        .about-grid {
+          display: grid;
+          grid-template-columns: 180px 1fr;
+          gap: 3rem;
+          align-items: flex-start;
+        }
+        .about-avatar-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
+          position: sticky;
+          top: 80px;
+        }
+        .about-avatar {
+          position: relative;
+          width: 140px;
+          height: 140px;
+          flex-shrink: 0;
+        }
+        .avatar-inner {
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: var(--surface);
+          border: 2px solid var(--green);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 0 32px rgba(0,255,136,0.2);
+          overflow: hidden;
+        }
+        .avatar-photo {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          object-position: center 75%;
+          border-radius: 50%;
+          display: block;
+        }
+        .avatar-ring {
+          position: absolute;
+          inset: -8px;
+          border-radius: 50%;
+          border: 1px dashed var(--green-dk);
+          animation: spin 14s linear infinite;
+          pointer-events: none;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .status-badge {
+          font-family: var(--mono);
+          font-size: 0.7rem;
+          color: var(--text-dim);
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+        }
+        .status-dot {
+          width: 7px; height: 7px;
+          border-radius: 50%;
+          background: var(--green);
+          box-shadow: 0 0 6px var(--green);
+          animation: blink 2s ease-in-out infinite;
+          flex-shrink: 0;
+        }
+        @keyframes blink { 0%,100% { opacity:1; } 50% { opacity: 0.3; } }
+        .about-skills { display: flex; flex-direction: column; gap: 0.4rem; width: 100%; }
+        .skill-tag {
+          font-family: var(--mono);
+          font-size: 0.65rem;
+          letter-spacing: 1px;
+          text-align: center;
+          color: var(--text-dim);
+          background: var(--surface2);
+          border: 1px solid var(--border);
+          border-radius: 3px;
+          padding: 3px 0;
+          text-transform: uppercase;
+        }
+
+        .about-heading {
+          font-family: var(--head);
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: var(--text);
+          margin-bottom: 0.85rem;
+          letter-spacing: 0.5px;
+        }
+        .about-intro-block p {
+          font-size: 0.93rem;
+          line-height: 1.85;
+          color: var(--text);
+          opacity: 0.8;
+          margin-bottom: 0.65rem;
+        }
+        .about-details {
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.1rem 1.25rem;
+          margin: 1.75rem 0;
+          display: flex;
+          flex-direction: column;
+          gap: 0.7rem;
+        }
+        .detail-row {
+          display: flex;
+          gap: 1rem;
+          align-items: baseline;
+          flex-wrap: wrap;
+          padding-bottom: 0.6rem;
+          border-bottom: 1px solid var(--border);
+        }
+        .detail-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .detail-label {
+          font-family: var(--mono);
+          font-size: 0.75rem;
+          color: var(--text-dim);
+          min-width: 175px;
+          flex-shrink: 0;
+        }
+        .detail-value { font-size: 0.88rem; color: var(--text); }
+        .about-mission {
+          background: rgba(0,255,136,0.03);
+          border: 1px solid var(--green-dk);
+          border-radius: var(--radius);
+          padding: 1.25rem;
+          margin-bottom: 1.25rem;
+        }
+        .about-mission h3 {
+          font-family: var(--head);
+          font-size: 0.85rem;
+          font-weight: 700;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--green);
+          margin-bottom: 0.65rem;
+        }
+        .about-mission p { font-size: 0.9rem; color: var(--text); opacity: 0.78; line-height: 1.85; }
+        .about-contact-note {
+          display: flex;
+          gap: 0.75rem;
+          align-items: flex-start;
+          background: var(--surface);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1rem 1.25rem;
+        }
+        .contact-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+        .about-contact-note p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.65; }
+
+        /* ══ FOOTER ═════════════════════════════════════════════════════════ */
+        .footer {
+          border-top: 1px solid var(--border);
+          background: var(--bg2);
+          margin-top: 5rem;
+        }
+        .footer-inner {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 2.5rem 1.25rem;
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 2rem;
+        }
+        .footer-brand .nav-logo,
+        .footer-brand {
+          font-family: var(--mono);
+          font-size: 1.05rem;
+          color: var(--green);
+          letter-spacing: 2px;
+          text-shadow: 0 0 10px var(--green);
+          border: none;
+          background: none;
+          padding: 0;
+          margin-bottom: 0.75rem;
+          display: block;
+        }
+        .footer-brand p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.65; }
+        .footer-links { display: flex; flex-direction: column; gap: 0.4rem; }
+        .footer-links-title {
+          font-family: var(--mono);
+          font-size: 0.68rem;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: var(--accent);
+          margin-bottom: 0.4rem;
+        }
+        .footer-link {
+          background: none;
+          border: none;
+          font-family: var(--body);
+          font-size: 0.84rem;
+          color: var(--text-dim);
+          text-align: left;
+          padding: 0;
+          transition: color 0.2s;
+        }
+        .footer-link:hover { color: var(--green); }
+        .footer-note p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.7; }
+        .footer-bottom {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 1rem 1.25rem;
+          border-top: 1px solid var(--border);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          font-family: var(--mono);
+          font-size: 0.7rem;
+          color: var(--text-dim);
+        }
+        .footer-tag { color: var(--green); opacity: 0.6; }
+
+        /* ══ GLITCH ═════════════════════════════════════════════════════════ */
+        .glitch-text {
+          position: relative;
+          display: inline-block;
+          color: var(--green);
+        }
+        .glitch-text::before,
+        .glitch-text::after {
+          content: attr(data-text);
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          color: var(--green);
+        }
+        .glitch-text::before {
+          color: var(--accent);
+          animation: glitch1 5s infinite;
+          clip-path: polygon(0 30%, 100% 30%, 100% 50%, 0 50%);
+        }
+        .glitch-text::after {
+          color: #ff0055;
+          animation: glitch2 5s infinite;
+          clip-path: polygon(0 60%, 100% 60%, 100% 75%, 0 75%);
+        }
+        @keyframes glitch1 {
+          0%,88%,100% { transform: none; opacity: 0; }
+          89% { transform: translateX(-4px); opacity: 0.9; }
+          91% { transform: translateX(3px); opacity: 0.9; }
+          93% { transform: none; opacity: 0; }
+        }
+        @keyframes glitch2 {
+          0%,91%,100% { transform: none; opacity: 0; }
+          92% { transform: translateX(5px); opacity: 0.7; }
+          95% { transform: translateX(-3px); opacity: 0.7; }
+          97% { transform: none; opacity: 0; }
+        }
+
+        /* ══ RESPONSIVE ═════════════════════════════════════════════════════ */
+
+        /* Tablet: ≤ 900px */
+        @media (max-width: 900px) {
+          .card-grid-3 { grid-template-columns: repeat(2, 1fr); }
+          .tips-grid { grid-template-columns: repeat(2, 1fr); }
+          .articles-grid { grid-template-columns: 1fr; }
+          .about-grid { grid-template-columns: 1fr; }
+          .about-avatar-col {
+            position: static;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 1.25rem;
+          }
+          .about-skills { flex-direction: row; flex-wrap: wrap; gap: 0.4rem; }
+          .skill-tag { padding: 3px 8px; }
+          .footer-inner { grid-template-columns: 1fr 1fr; }
+          .footer-note { grid-column: 1 / -1; }
+        }
+
+        /* Mobile: ≤ 600px */
+        @media (max-width: 600px) {
+          .page { padding: 1.75rem 1rem 3rem; }
+          .hero-section { padding: 2rem 0 1rem; }
+          .hero-stats { gap: 0.6rem; }
+          .stat-card { min-width: 110px; padding: 0.85rem 1rem; }
+          .stat-num { font-size: 1.4rem; }
+          .hero-btns { flex-direction: column; align-items: center; }
+          .btn-primary, .btn-secondary { width: 100%; max-width: 280px; text-align: center; }
+          .card-grid-3 { grid-template-columns: 1fr; }
+          .tips-grid { grid-template-columns: 1fr; }
+          .timeline-item { grid-template-columns: 44px 1fr; }
+          .acc-title { font-size: 0.82rem; }
+          .disc-list-item { flex-direction: column; gap: 0.25rem; }
+          .email-field { font-size: 0.73rem; }
+          .reflection-item { grid-template-columns: 1fr; gap: 0.75rem; }
+          .reflection-num { font-size: 1.2rem; }
+          .about-avatar-col { flex-direction: column; align-items: flex-start; }
+          .about-avatar { width: 90px; height: 90px; }
+          .avatar-initials { font-size: 1.6rem; }
+          .detail-label { min-width: unset; width: 100%; }
+          .footer-inner { grid-template-columns: 1fr; }
+          .footer-bottom { flex-direction: column; align-items: flex-start; gap: 0.25rem; }
+          .section-title { font-size: 1.05rem; }
+          .page-title { font-size: clamp(1.6rem, 8vw, 2.5rem); }
+        }
+
+        /* Extra small: ≤ 380px */
+        @media (max-width: 380px) {
+          .hero-title { font-size: 3rem; }
+          .stat-card { flex: 0 0 calc(50% - 0.4rem); max-width: none; }
+        }
+      `}</style>
+
+      <NavBar active={active} setActive={setActive} />
+      {pages[active]}
+      <Footer setActive={setActive} />
+    </>
+  );
+}
