@@ -326,8 +326,8 @@ function HomePage({ setActive }) {
           Phishing is one of the oldest and most effective cyberattacks in
           existence. By exploiting human trust rather than technical
           vulnerabilities, attackers trick individuals into surrendering
-          passwords, financial data, and sensitive information — with
-          devastating consequences.
+          passwords, financial data, and sensitive information with devastating
+          consequences.
         </p>
         <div className="hero-stats">
           {[
@@ -487,7 +487,7 @@ function DiscussionPage() {
           Deep Dive: <span className="accent">Phishing</span>
         </h1>
         <p className="page-intro">
-          A comprehensive breakdown of phishing — its mechanics, history,
+          A comprehensive breakdown of phishing its mechanics, history,
           variants, real-world examples, and how to defend against it.
         </p>
       </div>
@@ -677,17 +677,17 @@ function ReflectionPage() {
     {
       num: "01",
       title: "What Studying Phishing Taught Me",
-      text: "Before I began researching this topic, I thought phishing was simply about fake emails and obvious scams — the kind you can spot from a mile away. But diving deeper revealed something far more unsettling: modern phishing is a sophisticated psychological discipline. Attackers don't just send random spam; they study their targets, mirror their language, and weaponize emotions like urgency and fear. The realization that some of the world's largest corporations — Google and Meta among them — have fallen victim to phishing schemes humbled me. It made me understand that technical knowledge alone doesn't protect you; emotional awareness does. Learning to pause, question, and verify before acting on any digital request is a skill I now treat as essential as any technical literacy.",
+      text: "Before I began researching this topic, I thought phishing was simply about fake emails and obvious scams, the kind you can spot from a mile away. But diving deeper revealed something far more unsettling: modern phishing is a sophisticated psychological discipline. Attackers don't just send random spam; they study their targets, mirror their language, and weaponize emotions like urgency and fear. The realization that some of the world's largest corporations like Google and Meta among them have fallen victim to phishing schemes humbled me. It made me understand that technical knowledge alone doesn't protect you; emotional awareness does. Learning to pause, question, and verify before acting on any digital request is a skill I now treat as essential as any technical literacy.",
     },
     {
       num: "02",
       title: "The Human Element in Cybersecurity",
-      text: "One of the most striking insights from this study is how phishing exposes the profound gap between technological advancement and human vulnerability. We build firewalls, encryption protocols, and AI-powered threat detection — yet a single well-crafted email bypasses all of it by targeting the person sitting at the keyboard. This forces me to reconsider what 'security' truly means. True security isn't just about the tools we deploy; it's about the culture we build around awareness, skepticism, and shared responsibility. Organizations that invest in regular phishing simulations and employee education consistently report fewer successful attacks, proving that informed humans are the strongest firewall we have. This shift in perspective — from technology-first to people-first — feels like one of the most important lessons cybersecurity has to offer.",
+      text: "One of the most striking insights from this study is how phishing exposes the profound gap between technological advancement and human vulnerability. We build firewalls, encryption protocols, and AI-powered threat detection, yet a single well-crafted email bypasses all of it by targeting the person sitting at the keyboard. This forces me to reconsider what 'security' truly means. True security isn't just about the tools we deploy; it's about the culture we build around awareness, skepticism, and shared responsibility. Organizations that invest in regular phishing simulations and employee education consistently report fewer successful attacks, proving that informed humans are the strongest firewall we have. This shift in perspective from technology-first to people-first, feels like one of the most important lessons cybersecurity has to offer.",
     },
     {
       num: "03",
       title: "Looking Forward: AI and the Evolving Threat",
-      text: "Perhaps the most alarming development I encountered was the rise of AI-generated phishing. Large language models can now craft hyper-personalized, grammatically perfect, emotionally calibrated phishing messages at industrial scale — eliminating the spelling errors and awkward phrasing that once served as red flags. This arms race between attackers leveraging AI and defenders scrambling to keep up raises a difficult question: can we ever truly 'solve' phishing? My reflection is that we cannot eliminate it entirely, but we can make societies resilient to it. Digital literacy — teaching people of all ages to think critically about what they see online — must become as fundamental as reading and writing. The responsibility doesn't only fall on IT departments; it falls on educators, governments, and each of us as individuals navigating an increasingly deceptive digital world.",
+      text: "Perhaps the most alarming development I encountered was the rise of AI-generated phishing. Large language models can now craft hyper-personalized, grammatically perfect, emotionally calibrated phishing messages at industrial scale eliminating the spelling errors and awkward phrasing that once served as red flags. This arms race between attackers leveraging AI and defenders scrambling to keep up raises a difficult question: can we ever truly 'solve' phishing? My reflection is that we cannot eliminate it entirely, but we can make societies resilient to it. Digital literacy, teaching people of all ages to think critically about what they see online must become as fundamental as reading and writing. The responsibility doesn't only fall on IT departments; it falls on educators, governments, and each of us as individuals navigating an increasingly deceptive digital world.",
     },
   ];
 
@@ -699,7 +699,7 @@ function ReflectionPage() {
           Personal <span className="accent">Reflection</span>
         </h1>
         <p className="page-intro">
-          Three paragraphs reflecting on the study of phishing — what it
+          Three paragraphs reflecting on the study of phishing, what it
           revealed, why it matters, and what it means for the future.
         </p>
       </div>
@@ -768,9 +768,9 @@ function AboutPage() {
             <p>
               I'm a student passionate about understanding the digital threats
               that shape our connected world. This website was created as part
-              of an academic exploration of cybersecurity topics — with a
-              specific focus on phishing, one of the most persistent and
-              human-centered threats in the field.
+              of an academic exploration of cybersecurity topics with a specific
+              focus on phishing, one of the most persistent and human-centered
+              threats in the field.
             </p>
             <p>
               My interest in cybersecurity grew from a simple realization:
