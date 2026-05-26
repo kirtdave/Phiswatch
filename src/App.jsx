@@ -73,7 +73,7 @@ const DISCUSSION_SECTIONS = [
     content: [
       {
         type: "text",
-        text: "Phishing dates back to the mid-1990s when AOL was the dominant internet provider. Hackers posed as AOL staff to steal user credentials — the term 'phishing' first appeared in 1996 in a hacker newsgroup. By the early 2000s, phishing had evolved to target banks and e-commerce sites.",
+        text: "Phishing dates back to the mid-1990s when AOL was the dominant internet provider. Hackers posed as AOL staff to steal user credentials the term 'phishing' first appeared in 1996 in a hacker newsgroup. By the early 2000s, phishing had evolved to target banks and e-commerce sites.",
       },
       {
         type: "text",
