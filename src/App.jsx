@@ -629,7 +629,7 @@ function HomePage({ setActive, booting }) {
           {[
             {
               icon: "🔍",
-              tip: "Always verify sender email addresses — not just display names.",
+              tip: "Always verify sender email addresses not just display names.",
             },
             {
               icon: "🔐",
@@ -637,7 +637,7 @@ function HomePage({ setActive, booting }) {
             },
             {
               icon: "🚫",
-              tip: "Never click links in unsolicited emails — navigate directly.",
+              tip: "Never click links in unsolicited emails navigate directly.",
             },
             {
               icon: "📞",
