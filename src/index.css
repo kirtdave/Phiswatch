@@ -2,48 +2,17 @@
 body {
   isolation: isolate;
 }
-/* ══ TOAST ══════════════════════════════════════════════════════════════ */
-@keyframes toastIn {
-  from {
-    opacity: 0;
-    transform: translateX(110%);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-@keyframes toastOut {
-  from {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(110%);
-  }
-}
-@keyframes toastProgress {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0%;
-  }
-}
-
-/* ══ SCROLLBAR ══════════════════════════════════════════════════════════ */
 ::-webkit-scrollbar {
   width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg2);
+  background: #071210;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--green);
+  background: #00ff88;
   border-radius: 4px;
-  box-shadow: 0 0 6px var(--green);
+  box-shadow: 0 0 6px #00ff88;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--green-dim);
+  background: #00cc6a;
 }

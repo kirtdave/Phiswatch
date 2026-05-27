@@ -1676,156 +1676,176 @@ function LoadingScreen({ onDone }) {
     </div>
   );
 }
-function ToastNotification() {
+
+export function ToastNotification() {
   const [visible, setVisible] = useState(false);
-  const [exiting, setExiting] = useState(false);
+  const [animClass, setAnimClass] = useState(""); // "" | "show" | "hide"
+  const autoRef = useRef(null);
 
-  useEffect(() => {
-    // Show after 5 seconds
-    const showTimer = setTimeout(() => setVisible(true), 8000);
-    return () => clearTimeout(showTimer);
-  }, []);
+  const showToast = () => {
+    clearTimeout(autoRef.current);
+    setVisible(true);
+    // Force a reflow cycle so the transition fires after mount
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => setAnimClass("show")),
+    );
+    autoRef.current = setTimeout(hideToast, 6000);
+  };
 
-  const dismiss = () => {
-    setExiting(true);
-    setTimeout(() => {
-      setVisible(false);
-      setExiting(false);
-    }, 400);
+  const hideToast = () => {
+    clearTimeout(autoRef.current);
+    setAnimClass("hide");
+    setTimeout(() => setVisible(false), 400);
   };
 
   useEffect(() => {
-    if (!visible) return;
-    // Auto-dismiss after 6 seconds
-    const hideTimer = setTimeout(dismiss, 6000);
-    return () => clearTimeout(hideTimer);
-  }, [visible]);
+    const timer = setTimeout(showToast, 20000);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(autoRef.current);
+    };
+  }, []);
 
   if (!visible) return null;
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: "1.5rem",
-        right: "1.5rem",
-        zIndex: 9998,
-        width: "min(340px, 90vw)",
-        background: "#0b1d15",
-        border: "1px solid rgba(255,68,68,0.4)",
-        borderLeft: "3px solid #ff4444",
-        borderRadius: "8px",
-        padding: "1rem 1.1rem",
-        fontFamily: "'Share Tech Mono', monospace",
-        boxShadow: "0 0 30px rgba(255,68,68,0.15), 0 8px 32px rgba(0,0,0,0.5)",
-        animation: exiting
-          ? "toastOut 0.4s ease forwards"
-          : "toastIn 0.4s ease forwards",
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: "0.5rem",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-          <span
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              background: "#ff4444",
-              boxShadow: "0 0 6px #ff4444",
-              display: "inline-block",
-              animation: "blink 1s ease-in-out infinite",
-            }}
-          />
-          <span
-            style={{
-              fontSize: "0.7rem",
-              letterSpacing: "2px",
-              color: "#ff4444",
-              fontWeight: "700",
-            }}
-          >
-            THREAT DETECTED
-          </span>
-        </div>
-        <button
-          onClick={dismiss}
-          style={{
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            color: "#4d7a5e",
-            fontSize: "1rem",
-            lineHeight: 1,
-            padding: "0 2px",
-          }}
-        >
-          ✕
-        </button>
-      </div>
+    <>
+      <style>{`
+        @keyframes toast-drain {
+          from { transform: scaleX(1); }
+          to   { transform: scaleX(0); }
+        }
+        .toast-notify {
+          position: fixed;
+          bottom: 1.5rem;
+          right: 1.5rem;
+          z-index: 9998;
+          width: min(340px, 90vw);
+          background: #0b1d15;
+          border: 1px solid rgba(255,68,68,0.35);
+          border-left: 3px solid #ff4444;
+          border-radius: 8px;
+          padding: 0.85rem 1rem;
+          font-family: var(--mono);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+          transform: translateX(120%);
+          opacity: 0;
+          transition: transform 0.38s cubic-bezier(0.22,1,0.36,1), opacity 0.28s ease;
+          overflow: hidden;
+        }
+        .toast-notify.show { transform: translateX(0); opacity: 1; }
+        .toast-notify.hide { transform: translateX(120%); opacity: 0; }
 
-      {/* Main message */}
-      <div
-        style={{
-          fontSize: "0.82rem",
-          color: "#c8ffd6",
-          marginBottom: "0.5rem",
-          lineHeight: 1.5,
-        }}
-      >
-        ⚠ <strong style={{ color: "#ff4444" }}>Phishing attempt blocked</strong>
-        <br />
-        <span style={{ color: "#4d7a5e", fontSize: "0.72rem" }}>
-          Suspicious link intercepted from unknown sender
-        </span>
-      </div>
+        .toast-bar-fill {
+          height: 2px;
+          background: #ff4444;
+          transform-origin: left;
+          animation: none;
+        }
+        .toast-notify.show .toast-bar-fill {
+          animation: toast-drain 6s linear forwards;
+        }
+        @keyframes toast-dot-blink {
+          0%,100% { opacity:1; } 50% { opacity:0.25; }
+        }
+        .toast-dot {
+          width: 7px; height: 7px; border-radius: 50%;
+          background: #ff4444; box-shadow: 0 0 5px #ff4444;
+          display: inline-block;
+          animation: toast-dot-blink 1.4s ease-in-out infinite;
+        }
+      `}</style>
 
-      {/* Details */}
-      <div
-        style={{
-          background: "#071210",
-          borderRadius: "4px",
-          padding: "0.5rem 0.7rem",
-          fontSize: "0.68rem",
-          color: "#4d7a5e",
-          marginBottom: "0.75rem",
-          lineHeight: 1.8,
-        }}
-      >
-        <span style={{ color: "#00ff88" }}>SOURCE:</span>{" "}
-        security@paypa1-alerts.com
-        <br />
-        <span style={{ color: "#00ff88" }}>TYPE:</span> Credential Harvesting
-        <br />
-        <span style={{ color: "#00ff88" }}>STATUS:</span>{" "}
-        <span style={{ color: "#ff4444" }}>BLOCKED ✓</span>
-      </div>
-
-      {/* Progress bar */}
-      <div
-        style={{
-          height: "2px",
-          background: "#163024",
-          borderRadius: "2px",
-          overflow: "hidden",
-        }}
-      >
+      <div className={`toast-notify ${animClass}`}>
         <div
           style={{
-            height: "100%",
-            background: "#ff4444",
-            animation: "toastProgress 6s linear forwards",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "0.5rem",
           }}
-        />
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "7px",
+              fontSize: "0.68rem",
+              letterSpacing: "2px",
+              color: "#ff4444",
+              fontWeight: 700,
+            }}
+          >
+            <span className="toast-dot" />
+            THREAT DETECTED
+          </div>
+          <button
+            onClick={hideToast}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#4d7a5e",
+              fontSize: "14px",
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        <div
+          style={{
+            fontSize: "0.82rem",
+            color: "#c8ffd6",
+            lineHeight: 1.5,
+            marginBottom: "0.5rem",
+          }}
+        >
+          <strong style={{ color: "#ff4444" }}>Phishing attempt blocked</strong>
+          <span
+            style={{
+              display: "block",
+              fontSize: "0.7rem",
+              color: "#4d7a5e",
+              marginTop: 2,
+            }}
+          >
+            Suspicious link intercepted from unknown sender
+          </span>
+        </div>
+
+        <div
+          style={{
+            background: "#071210",
+            borderRadius: 4,
+            padding: "0.45rem 0.65rem",
+            fontSize: "0.68rem",
+            color: "#4d7a5e",
+            lineHeight: 1.9,
+            marginBottom: "0.7rem",
+          }}
+        >
+          <span style={{ color: "#00ff88" }}>SOURCE:</span>{" "}
+          security@paypa1-alerts.com
+          <br />
+          <span style={{ color: "#00ff88" }}>TYPE:</span> Credential Harvesting
+          <br />
+          <span style={{ color: "#00ff88" }}>STATUS:</span>{" "}
+          <span style={{ color: "#ff4444" }}>BLOCKED ✓</span>
+        </div>
+
+        <div
+          style={{
+            height: 2,
+            background: "#163024",
+            borderRadius: 2,
+            overflow: "hidden",
+          }}
+        >
+          <div className="toast-bar-fill" />
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 // ── App Root ─────────────────────────────────────────────────────────────────
