@@ -211,22 +211,36 @@ function ParticleNetwork() {
     let particles = [];
 
     function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      const W = window.innerWidth;
+      const H = window.innerHeight;
+
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      canvas.style.width = W + "px";
+      canvas.style.height = H + "px";
+      ctx.scale(dpr, dpr);
+
+      canvas._W = W;
+      canvas._H = H;
     }
     resize();
     window.addEventListener("resize", resize);
 
     function Particle() {
-      this.x = Math.random() * canvas.width;
-      this.y = Math.random() * canvas.height;
+      const W = canvas._W || canvas.width;
+      const H = canvas._H || canvas.height;
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
       this.vx = (Math.random() - 0.5) * 0.4;
       this.vy = (Math.random() - 0.5) * 0.4;
       this.r = Math.random() * 1.5 + 0.5;
       this.opacity = Math.random() * 0.5 + 0.3;
     }
 
-    for (let i = 0; i < 110; i++) particles.push(new Particle());
+    const isMobile = window.innerWidth < 700;
+    const count = isMobile ? 55 : 110;
+    for (let i = 0; i < count; i++) particles.push(new Particle());
 
     const handleMouseMove = (e) => {
       mouseRef.current = { x: e.clientX, y: e.clientY };
@@ -238,7 +252,8 @@ function ParticleNetwork() {
     window.addEventListener("mouseleave", handleMouseLeave);
 
     function draw() {
-      const { width: W, height: H } = canvas;
+      const W = canvas._W || canvas.width;
+      const H = canvas._H || canvas.height;
       const { x: mx, y: my } = mouseRef.current;
       ctx.clearRect(0, 0, W, H);
 
@@ -315,8 +330,6 @@ function ParticleNetwork() {
       style={{
         position: "fixed",
         inset: 0,
-        width: "100%",
-        height: "100%",
         pointerEvents: "none",
         zIndex: 0,
       }}
