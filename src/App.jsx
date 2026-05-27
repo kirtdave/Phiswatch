@@ -1292,7 +1292,7 @@ function LoadingScreen({ onDone }) {
                 </div>
                 <div style={{ fontSize: "0.7rem", marginBottom: "0.25rem" }}>
                   <span style={{ color: "#4d7a5e" }}>TO: </span>
-                  <span style={{ color: "#c8ffd6" }}>you@youremail.com</span>
+                  <span style={{ color: "#c8ffd6" }}>davekirt7@gmail.com</span>
                 </div>
                 <div
                   style={{
