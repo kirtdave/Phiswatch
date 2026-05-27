@@ -941,7 +941,7 @@ function AboutPage() {
             <span className="status-dot"></span> Student · Researcher
           </div>
           <div className="about-skills">
-            {["Cybersecurity", "Research", "Web Dev", "IT Studies"].map((s) => (
+            {["Programmer", "Research", "Web Dev", "IT Studies"].map((s) => (
               <span className="skill-tag" key={s}>
                 {s}
               </span>
