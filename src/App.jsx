@@ -1185,7 +1185,7 @@ function LoadingScreen({ onDone }) {
   const [progress, setProgress] = useState(0);
 
   const subject =
-    "URGENT CONFIDENTIAL: $10,000,000 Transfer — Need Your Help Dear Friend";
+    "URGENT CONFIDENTIAL: $10,000,000 Transfer. Need Your Help Dear Friend";
   const body = [
     "Dear Beloved Friend,",
     "",
