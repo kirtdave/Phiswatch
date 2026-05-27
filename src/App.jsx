@@ -871,9 +871,29 @@ function QuizSection() {
     </div>
   );
 }
+function useScrollReveal() {
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("revealed");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12 },
+    );
 
+    const els = document.querySelectorAll(".reveal");
+    els.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
+}
 // ── Home Page ────────────────────────────────────────────────────────────────
 function HomePage({ setActive, booting }) {
+  useScrollReveal();
   return (
     <div className="page">
       {/* Hero */}
@@ -922,7 +942,7 @@ function HomePage({ setActive, booting }) {
       </section>
 
       {/* Summary Cards */}
-      <section className="section">
+      <section className="section reveal">
         <h2 className="section-title">Topic Overview</h2>
         <div className="card-grid-3">
           {[
@@ -952,7 +972,7 @@ function HomePage({ setActive, booting }) {
       </section>
 
       {/* Timeline */}
-      <section className="section">
+      <section className="section reveal">
         <h2 className="section-title">Evolution of Phishing</h2>
         <div className="timeline">
           {[
@@ -999,7 +1019,7 @@ function HomePage({ setActive, booting }) {
       </section>
 
       {/* Quick Tips */}
-      <section className="section">
+      <section className="section reveal">
         <h2 className="section-title">Quick Protection Tips</h2>
         <div className="tips-grid">
           {[
@@ -1042,6 +1062,7 @@ function HomePage({ setActive, booting }) {
 // ── Discussion Page ──────────────────────────────────────────────────────────
 function DiscussionPage() {
   const [open, setOpen] = useState(0);
+  useScrollReveal();
 
   return (
     <div className="page">
@@ -1119,7 +1140,7 @@ function DiscussionPage() {
       </div>
 
       {/* Phishing Email Anatomy */}
-      <section className="section">
+      <section className="section reveal">
         <h2 className="section-title">Anatomy of a Phishing Email</h2>
         <p
           style={{
@@ -1187,7 +1208,7 @@ function DiscussionPage() {
         </div>
       </section>
       {/* Nigerian Prince Email — Real World Example */}
-      <section className="section">
+      <section className="section reveal">
         <h2 className="section-title">
           A Classic Example: The Nigerian Prince
         </h2>
@@ -1340,7 +1361,7 @@ function DiscussionPage() {
           </div>
         </div>
       </section>
-      <section className="section">
+      <section className="section reveal">
         <h2 className="section-title">Test Your Skills</h2>
         <p
           style={{
@@ -1405,6 +1426,7 @@ function ArticlesPage() {
 
 // ── Reflection Page ──────────────────────────────────────────────────────────
 function ReflectionPage() {
+  useScrollReveal();
   const paragraphs = [
     {
       num: "01",
@@ -1460,6 +1482,7 @@ function ReflectionPage() {
 
 // ── About Page ───────────────────────────────────────────────────────────────
 function AboutPage() {
+  useScrollReveal();
   return (
     <div className="page">
       <div className="page-header">
@@ -3274,6 +3297,18 @@ export default function App() {
           .section-title { font-size: 1.05rem; }
           .page-title { font-size: clamp(1.6rem, 8vw, 2.5rem); }
         }
+          .reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
 
         /* Extra small: ≤ 380px */
         @media (max-width: 380px) {
