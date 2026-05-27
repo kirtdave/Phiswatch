@@ -810,6 +810,160 @@ function DiscussionPage() {
           </div>
         </div>
       </section>
+      {/* Nigerian Prince Email — Real World Example */}
+      <section className="section">
+        <h2 className="section-title">
+          A Classic Example: The Nigerian Prince
+        </h2>
+        <p
+          style={{
+            color: "var(--text-dim)",
+            fontSize: "0.9rem",
+            marginBottom: "1.5rem",
+          }}
+        >
+          One of the oldest and most infamous phishing emails in history the
+          "Nigerian Prince" scam. Despite being obvious to most, it still tricks
+          thousands of people every year.
+        </p>
+        <div className="email-mock">
+          <div className="email-titlebar">
+            <div className="email-dots">
+              <span style={{ background: "#ff5f57" }}></span>
+              <span style={{ background: "#ffbd2e" }}></span>
+              <span style={{ background: "#28c840" }}></span>
+            </div>
+            <span className="email-titlebar-text">📧 Inbox — Mail Client</span>
+          </div>
+          <div className="email-body">
+            <div className="email-field">
+              <span className="ef-label">From:</span>
+              <span className="ef-danger">
+                prince.adewale@totally-real-nigeria.com
+              </span>
+              <span className="ef-tag ef-red">⚠ FAKE DOMAIN</span>
+            </div>
+            <div className="email-field">
+              <span className="ef-label">To:</span>
+              <span className="ef-value">davekirt7@gmail.com</span>
+            </div>
+            <div className="email-field">
+              <span className="ef-label">Subject:</span>
+              <span className="ef-danger">
+                URGENT CONFIDENTIAL: $10,000,000 Transfer — Need Your Help Dear
+                Friend
+              </span>
+              <span className="ef-tag ef-orange">
+                ⚠ URGENCY + GREED TRIGGER
+              </span>
+            </div>
+            <div className="email-hr"></div>
+            <div className="email-content">
+              <p>Dear Beloved Friend,</p>
+              <p>
+                I am <strong>Prince Adewale Okonkwo of Nigeria</strong>.{" "}
+                <span className="ef-tag ef-orange">⚠ FAKE AUTHORITY</span>
+              </p>
+              <p>
+                My late father the King has left{" "}
+                <strong>$10,000,000 USD</strong> in a secret account. I need
+                ONLY your{" "}
+                <strong>bank details, SSN, and mother's maiden name</strong> to
+                transfer this fortune. You keep <strong>40%</strong> dear
+                friend.{" "}
+                <span className="ef-tag ef-red">⚠ REQUESTS SENSITIVE DATA</span>
+              </p>
+              <p>
+                Please reply with urgency. God bless you abundantly.{" "}
+                <span className="ef-tag ef-orange">⚠ FALSE URGENCY</span>
+              </p>
+              <p className="email-sig">
+                — H.R.H Prince Adewale Okonkwo III 👑
+                <br />
+                <span style={{ fontSize: "0.75rem", color: "var(--text-dim)" }}>
+                  Kingdom of Nigeria, Royal Treasury Division
+                </span>
+              </p>
+            </div>
+
+            {/* Why it works */}
+            <div
+              style={{
+                marginTop: "1rem",
+                padding: "0.75rem",
+                background: "var(--surface2)",
+                borderRadius: "6px",
+                borderLeft: "2px solid var(--green-dk)",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "0.72rem",
+                  fontFamily: "var(--mono)",
+                  color: "var(--green)",
+                  letterSpacing: "1px",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                // WHY THIS STILL WORKS IN {new Date().getFullYear()}
+              </div>
+              {[
+                {
+                  tag: "GREED",
+                  desc: "Promise of life-changing money overrides rational thinking.",
+                },
+                {
+                  tag: "URGENCY",
+                  desc: "Pressure to act fast prevents victims from verifying the claim.",
+                },
+                {
+                  tag: "AUTHORITY",
+                  desc: "Royal title creates false legitimacy and trust.",
+                },
+                {
+                  tag: "ADVANCE FEE",
+                  desc: "Victims pay small 'processing fees' expecting millions in return.",
+                },
+              ].map(({ tag, desc }) => (
+                <div
+                  key={tag}
+                  style={{
+                    display: "flex",
+                    gap: "0.6rem",
+                    marginBottom: "0.35rem",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontSize: "0.65rem",
+                      fontFamily: "var(--mono)",
+                      color: "#ff4444",
+                      background: "rgba(255,68,68,0.1)",
+                      border: "1px solid rgba(255,68,68,0.25)",
+                      padding: "1px 6px",
+                      borderRadius: "3px",
+                      whiteSpace: "nowrap",
+                      alignSelf: "flex-start",
+                    }}
+                  >
+                    {tag}
+                  </span>
+                  <span
+                    style={{
+                      fontSize: "0.82rem",
+                      color: "var(--text-dim)",
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    {desc}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }
@@ -1528,7 +1682,7 @@ function ToastNotification() {
 
   useEffect(() => {
     // Show after 5 seconds
-    const showTimer = setTimeout(() => setVisible(true), 5000);
+    const showTimer = setTimeout(() => setVisible(true), 8000);
     return () => clearTimeout(showTimer);
   }, []);
 
@@ -1671,22 +1825,6 @@ function ToastNotification() {
           }}
         />
       </div>
-
-      {/* Inline keyframes */}
-      <style>{`
-        @keyframes toastIn {
-          from { opacity: 0; transform: translateX(110%); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes toastOut {
-          from { opacity: 1; transform: translateX(0); }
-          to   { opacity: 0; transform: translateX(110%); }
-        }
-        @keyframes toastProgress {
-          from { width: 100%; }
-          to   { width: 0%; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -1722,6 +1860,7 @@ export default function App() {
           zIndex: 1,
           opacity: booting ? 0 : 1, // ← fade the site in
           transition: "opacity 0.6s ease", // ← smooth fade
+          overflow: "visible",
         }}
       >
         <style>{`
