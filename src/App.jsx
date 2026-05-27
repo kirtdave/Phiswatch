@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const NAV_LINKS = ["Home", "Discussion", "Articles", "Reflection", "About"];
 
@@ -200,6 +200,129 @@ const DISCUSSION_SECTIONS = [
   },
 ];
 
+function ParticleNetwork() {
+  const canvasRef = useRef(null);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    let animId;
+    let particles = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    function Particle() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = (Math.random() - 0.5) * 0.4;
+      this.r = Math.random() * 1.5 + 0.5;
+      this.opacity = Math.random() * 0.5 + 0.3;
+    }
+
+    for (let i = 0; i < 110; i++) particles.push(new Particle());
+
+    const handleMouseMove = (e) => {
+      mouseRef.current = { x: e.clientX, y: e.clientY };
+    };
+    const handleMouseLeave = () => {
+      mouseRef.current = { x: -9999, y: -9999 };
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseleave", handleMouseLeave);
+
+    function draw() {
+      const { width: W, height: H } = canvas;
+      const { x: mx, y: my } = mouseRef.current;
+      ctx.clearRect(0, 0, W, H);
+
+      const maxDist = 130,
+        mouseDist = 180;
+
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > W) p.vx *= -1;
+        if (p.y < 0 || p.y > H) p.vy *= -1;
+
+        // Mouse repulsion
+        const mdx = mx - p.x,
+          mdy = my - p.y;
+        const md = Math.sqrt(mdx * mdx + mdy * mdy);
+        if (md < mouseDist) {
+          const force = ((mouseDist - md) / mouseDist) * 0.6;
+          p.x -= mdx * force * 0.02;
+          p.y -= mdy * force * 0.02;
+        }
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0,255,136,${p.opacity})`;
+        ctx.fill();
+
+        // Lines between nearby particles
+        for (let j = i + 1; j < particles.length; j++) {
+          const q = particles[j];
+          const dx = p.x - q.x,
+            dy = p.y - q.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < maxDist) {
+            const alpha = (1 - dist / maxDist) * 0.2;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(q.x, q.y);
+            ctx.strokeStyle = `rgba(0,255,136,${alpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.stroke();
+          }
+        }
+
+        // Lines to mouse cursor
+        const md2 = Math.sqrt((mx - p.x) ** 2 + (my - p.y) ** 2);
+        if (md2 < mouseDist) {
+          const alpha2 = (1 - md2 / mouseDist) * 0.5;
+          ctx.beginPath();
+          ctx.moveTo(p.x, p.y);
+          ctx.lineTo(mx, my);
+          ctx.strokeStyle = `rgba(0,229,255,${alpha2})`;
+          ctx.lineWidth = 0.7;
+          ctx.stroke();
+        }
+      }
+
+      animId = requestAnimationFrame(draw);
+    }
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
+    />
+  );
+}
 // ── Glitch Text ──────────────────────────────────────────────────────────────
 function GlitchText({ text }) {
   return (
@@ -310,8 +433,58 @@ function Footer({ setActive }) {
   );
 }
 
+function useCountUp(target, duration = 2000, trigger = true) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!trigger) return;
+    setCount(0); // ← reset to 0 before starting
+    let start = 0;
+    const steps = 60;
+    const stepTime = duration / steps;
+    const increment = target / steps;
+
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else {
+        setCount(start);
+      }
+    }, stepTime);
+
+    return () => clearInterval(timer);
+  }, [target, duration, trigger]); // ← trigger in deps
+
+  return count;
+}
+
+function AnimatedStat({ num, label, trigger }) {
+  // ← add trigger prop
+  const isB = num.includes("B");
+  const isPercent = num.includes("%");
+  const isDollar = num.startsWith("$");
+  const isM = num.includes("M");
+
+  const rawNum = parseFloat(num.replace(/[^0-9.]/g, ""));
+  const count = useCountUp(rawNum, 2000, trigger); // ← pass trigger
+
+  let display = "";
+  if (isB) display = `${count.toFixed(1)}B`;
+  else if (isPercent) display = `${Math.round(count)}%`;
+  else if (isDollar && isM) display = `$${count.toFixed(1)}M`;
+  else display = Math.round(count).toString();
+
+  return (
+    <div className="stat-card">
+      <span className="stat-num">{display}</span>
+      <span className="stat-label">{label}</span>
+    </div>
+  );
+}
 // ── Home Page ────────────────────────────────────────────────────────────────
-function HomePage({ setActive }) {
+function HomePage({ setActive, booting }) {
   return (
     <div className="page">
       {/* Hero */}
@@ -335,10 +508,12 @@ function HomePage({ setActive }) {
             { num: "36%", label: "Of data breaches involve phishing" },
             { num: "$17.7M", label: "Avg. annual cost per organization" },
           ].map(({ num, label }) => (
-            <div className="stat-card" key={num}>
-              <span className="stat-num">{num}</span>
-              <span className="stat-label">{label}</span>
-            </div>
+            <AnimatedStat
+              key={num}
+              num={num}
+              label={label}
+              trigger={!booting}
+            />
           ))}
         </div>
         <div className="hero-btns">
@@ -833,13 +1008,394 @@ function AboutPage() {
     </div>
   );
 }
+function LoadingScreen({ onDone }) {
+  const [lines, setLines] = useState([]);
+  const [visible, setVisible] = useState(true);
 
+  const bootLines = [
+    "> INITIALIZING PHISHWATCH v2.4.1...",
+    "> LOADING THREAT DATABASE............[OK]",
+    "> SCANNING NETWORK INTERFACES........[OK]",
+    "> ESTABLISHING SECURE CONNECTION.....[OK]",
+    "> LOADING PHISHING SIGNATURES........[OK]",
+    "> DECRYPTING PAYLOAD.................[OK]",
+    "> BYPASSING FIREWALL.................[OK]",
+    "> ALL SYSTEMS NOMINAL",
+    "> LAUNCHING PHISHWATCH...",
+  ];
+
+  useEffect(() => {
+    let i = 0;
+    const delays = [0, 300, 600, 950, 1250, 1550, 1800, 2100, 2500];
+
+    const timers = bootLines.map((line, index) =>
+      setTimeout(() => {
+        setLines((prev) => [...prev, line]);
+      }, delays[index]),
+    );
+
+    const exitTimer = setTimeout(() => {
+      setVisible(false);
+      setTimeout(onDone, 600);
+    }, 3200);
+
+    return () => {
+      timers.forEach(clearTimeout);
+      clearTimeout(exitTimer);
+    };
+  }, []);
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "#030a06",
+        zIndex: 9999,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        fontFamily: "'Share Tech Mono', monospace",
+        opacity: visible ? 1 : 0,
+        transition: "opacity 0.6s ease",
+      }}
+    >
+      {/* Scanlines overlay */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,100,0.015) 2px, rgba(0,255,100,0.015) 4px)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Logo */}
+      <div
+        style={{
+          fontSize: "clamp(1.4rem, 5vw, 2.2rem)",
+          color: "#00ff88",
+          letterSpacing: "6px",
+          textShadow: "0 0 30px #00ff88, 0 0 60px rgba(0,255,136,0.3)",
+          marginBottom: "2.5rem",
+          fontWeight: "bold",
+        }}
+      >
+        [PHISH<span style={{ color: "#00e5ff" }}>WATCH</span>]
+      </div>
+
+      {/* Terminal box */}
+      <div
+        style={{
+          width: "min(560px, 90vw)",
+          background: "#071210",
+          border: "1px solid #163024",
+          borderRadius: "8px",
+          overflow: "hidden",
+        }}
+      >
+        {/* Titlebar */}
+        <div
+          style={{
+            background: "#081208",
+            borderBottom: "1px solid #163024",
+            padding: "0.5rem 1rem",
+            display: "flex",
+            alignItems: "center",
+            gap: "0.6rem",
+          }}
+        >
+          <span
+            style={{
+              width: 11,
+              height: 11,
+              borderRadius: "50%",
+              background: "#ff5f57",
+              display: "inline-block",
+            }}
+          />
+          <span
+            style={{
+              width: 11,
+              height: 11,
+              borderRadius: "50%",
+              background: "#ffbd2e",
+              display: "inline-block",
+            }}
+          />
+          <span
+            style={{
+              width: 11,
+              height: 11,
+              borderRadius: "50%",
+              background: "#28c840",
+              display: "inline-block",
+            }}
+          />
+          <span
+            style={{
+              fontSize: "0.7rem",
+              color: "#4d7a5e",
+              marginLeft: "0.5rem",
+              letterSpacing: "1px",
+            }}
+          >
+            phishwatch — boot_sequence.sh
+          </span>
+        </div>
+
+        {/* Terminal lines */}
+        <div style={{ padding: "1.25rem 1.5rem", minHeight: "200px" }}>
+          {lines.map((line, i) => {
+            const isOK = line.includes("[OK]");
+            const isLast = i === lines.length - 1;
+            return (
+              <div
+                key={i}
+                style={{
+                  fontSize: "0.82rem",
+                  lineHeight: "1.9",
+                  color: isOK
+                    ? "#4d7a5e"
+                    : line.includes("LAUNCHING") || line.includes("NOMINAL")
+                      ? "#00ff88"
+                      : "#c8ffd6",
+                }}
+              >
+                {line}
+                {isOK && (
+                  <span style={{ color: "#00ff88", marginLeft: "4px" }}>✓</span>
+                )}
+                {isLast && !isOK && (
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: "8px",
+                      height: "14px",
+                      background: "#00ff88",
+                      marginLeft: "4px",
+                      verticalAlign: "middle",
+                      animation: "blink 1s step-end infinite",
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Progress bar */}
+      <div
+        style={{
+          width: "min(560px, 90vw)",
+          height: "2px",
+          background: "#163024",
+          marginTop: "1.5rem",
+          borderRadius: "2px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            background: "#00ff88",
+            boxShadow: "0 0 8px #00ff88",
+            width: `${(lines.length / bootLines.length) * 100}%`,
+            transition: "width 0.3s ease",
+          }}
+        />
+      </div>
+      <div
+        style={{
+          fontSize: "0.68rem",
+          color: "#4d7a5e",
+          marginTop: "0.5rem",
+          letterSpacing: "1px",
+        }}
+      >
+        {Math.round((lines.length / bootLines.length) * 100)}% LOADED
+      </div>
+    </div>
+  );
+}
+function ToastNotification() {
+  const [visible, setVisible] = useState(false);
+  const [exiting, setExiting] = useState(false);
+
+  useEffect(() => {
+    // Show after 5 seconds
+    const showTimer = setTimeout(() => setVisible(true), 5000);
+    return () => clearTimeout(showTimer);
+  }, []);
+
+  const dismiss = () => {
+    setExiting(true);
+    setTimeout(() => {
+      setVisible(false);
+      setExiting(false);
+    }, 400);
+  };
+
+  useEffect(() => {
+    if (!visible) return;
+    // Auto-dismiss after 6 seconds
+    const hideTimer = setTimeout(dismiss, 6000);
+    return () => clearTimeout(hideTimer);
+  }, [visible]);
+
+  if (!visible) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        bottom: "1.5rem",
+        right: "1.5rem",
+        zIndex: 9998,
+        width: "min(340px, 90vw)",
+        background: "#0b1d15",
+        border: "1px solid rgba(255,68,68,0.4)",
+        borderLeft: "3px solid #ff4444",
+        borderRadius: "8px",
+        padding: "1rem 1.1rem",
+        fontFamily: "'Share Tech Mono', monospace",
+        boxShadow: "0 0 30px rgba(255,68,68,0.15), 0 8px 32px rgba(0,0,0,0.5)",
+        animation: exiting
+          ? "toastOut 0.4s ease forwards"
+          : "toastIn 0.4s ease forwards",
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "0.5rem",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+          <span
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: "#ff4444",
+              boxShadow: "0 0 6px #ff4444",
+              display: "inline-block",
+              animation: "blink 1s ease-in-out infinite",
+            }}
+          />
+          <span
+            style={{
+              fontSize: "0.7rem",
+              letterSpacing: "2px",
+              color: "#ff4444",
+              fontWeight: "700",
+            }}
+          >
+            THREAT DETECTED
+          </span>
+        </div>
+        <button
+          onClick={dismiss}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            color: "#4d7a5e",
+            fontSize: "1rem",
+            lineHeight: 1,
+            padding: "0 2px",
+          }}
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Main message */}
+      <div
+        style={{
+          fontSize: "0.82rem",
+          color: "#c8ffd6",
+          marginBottom: "0.5rem",
+          lineHeight: 1.5,
+        }}
+      >
+        ⚠ <strong style={{ color: "#ff4444" }}>Phishing attempt blocked</strong>
+        <br />
+        <span style={{ color: "#4d7a5e", fontSize: "0.72rem" }}>
+          Suspicious link intercepted from unknown sender
+        </span>
+      </div>
+
+      {/* Details */}
+      <div
+        style={{
+          background: "#071210",
+          borderRadius: "4px",
+          padding: "0.5rem 0.7rem",
+          fontSize: "0.68rem",
+          color: "#4d7a5e",
+          marginBottom: "0.75rem",
+          lineHeight: 1.8,
+        }}
+      >
+        <span style={{ color: "#00ff88" }}>SOURCE:</span>{" "}
+        security@paypa1-alerts.com
+        <br />
+        <span style={{ color: "#00ff88" }}>TYPE:</span> Credential Harvesting
+        <br />
+        <span style={{ color: "#00ff88" }}>STATUS:</span>{" "}
+        <span style={{ color: "#ff4444" }}>BLOCKED ✓</span>
+      </div>
+
+      {/* Progress bar */}
+      <div
+        style={{
+          height: "2px",
+          background: "#163024",
+          borderRadius: "2px",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            height: "100%",
+            background: "#ff4444",
+            animation: "toastProgress 6s linear forwards",
+          }}
+        />
+      </div>
+
+      {/* Inline keyframes */}
+      <style>{`
+        @keyframes toastIn {
+          from { opacity: 0; transform: translateX(110%); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes toastOut {
+          from { opacity: 1; transform: translateX(0); }
+          to   { opacity: 0; transform: translateX(110%); }
+        }
+        @keyframes toastProgress {
+          from { width: 100%; }
+          to   { width: 0%; }
+        }
+      `}</style>
+    </div>
+  );
+}
 // ── App Root ─────────────────────────────────────────────────────────────────
 export default function App() {
   const [active, setActive] = useState("Home");
+  const [booting, setBooting] = useState(true);
 
   const pages = {
-    Home: <HomePage setActive={setActive} />,
+    Home: <HomePage setActive={setActive} booting={booting} />,
     Discussion: <DiscussionPage />,
     Articles: <ArticlesPage />,
     Reflection: <ReflectionPage />,
@@ -848,7 +1404,11 @@ export default function App() {
 
   return (
     <>
-      <style>{`
+      {booting && <LoadingScreen onDone={() => setBooting(false)} />}
+      <ParticleNetwork />
+      <ToastNotification />
+      <div style={{ position: "relative", zIndex: 1 }}>
+        <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,600;0,800;1,400&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1857,9 +2417,10 @@ export default function App() {
         }
       `}</style>
 
-      <NavBar active={active} setActive={setActive} />
-      {pages[active]}
-      <Footer setActive={setActive} />
+        <NavBar active={active} setActive={setActive} />
+        {pages[active]}
+        <Footer setActive={setActive} />
+      </div>
     </>
   );
 }
