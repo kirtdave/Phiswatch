@@ -1393,6 +1393,7 @@ function ToastNotification() {
 export default function App() {
   const [active, setActive] = useState("Home");
   const [booting, setBooting] = useState(true);
+  const [showLoader, setShowLoader] = useState(true); // controls DOM presence
 
   const pages = {
     Home: <HomePage setActive={setActive} booting={booting} />,
@@ -1404,10 +1405,24 @@ export default function App() {
 
   return (
     <>
-      {booting && <LoadingScreen onDone={() => setBooting(false)} />}
+      {showLoader && (
+        <LoadingScreen
+          onDone={() => {
+            setBooting(false); // start counters
+            setTimeout(() => setShowLoader(false), 700); // remove from DOM after fade
+          }}
+        />
+      )}
       <ParticleNetwork />
       <ToastNotification />
-      <div style={{ position: "relative", zIndex: 1 }}>
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          opacity: booting ? 0 : 1, // ← fade the site in
+          transition: "opacity 0.6s ease", // ← smooth fade
+        }}
+      >
         <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Exo+2:ital,wght@0,300;0,400;0,600;0,800;1,400&display=swap');
 
