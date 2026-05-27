@@ -972,15 +972,15 @@ function AboutPage() {
             {[
               {
                 label: "📚 Field of Study",
-                value: "Information Technology / Cybersecurity",
+                value: "Information Technology",
               },
               {
                 label: "🎯 Focus Area",
-                value: "Social Engineering & Digital Threats",
+                value: "Web Development / Automation",
               },
               {
                 label: "💡 Interests",
-                value: "Network Security, Ethical Hacking, Digital Forensics",
+                value: "Network Security, Ethical Hacking, Digital Technology",
               },
               { label: "🌐 Location", value: "Philippines" },
               {
