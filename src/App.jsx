@@ -1022,41 +1022,161 @@ function AboutPage() {
   );
 }
 function LoadingScreen({ onDone }) {
-  const [lines, setLines] = useState([]);
   const [visible, setVisible] = useState(true);
+  const [phase, setPhase] = useState("email"); // "email" | "scan" | "blocked" | "boot"
+  const [scanLines, setScanLines] = useState([]);
+  const [bootLines, setBootLines] = useState([]);
+  const [typedSubject, setTypedSubject] = useState("");
+  const [typedBody, setTypedBody] = useState("");
+  const [progress, setProgress] = useState(0);
 
-  const bootLines = [
-    "> INITIALIZING PHISHPEACE ...",
-    "> LOADING THREAT DATABASE............[OK]",
-    "> SCANNING NETWORK INTERFACES........[OK]",
-    "> ESTABLISHING SECURE CONNECTION.....[OK]",
-    "> LOADING PHISHING SIGNATURES........[OK]",
-    "> DECRYPTING PAYLOAD.................[OK]",
-    "> BYPASSING FIREWALL.................[OK]",
-    "> ALL SYSTEMS NOMINAL",
-    "> LAUNCHING PHISHWATCH...",
+  const subject =
+    "URGENT CONFIDENTIAL: $10,000,000 Transfer — Need Your Help Dear Friend";
+  const body = [
+    "Dear Beloved Friend,",
+    "",
+    "I am Prince Adewale Okonkwo of Nigeria. My late father",
+    "the King has left $10,000,000 USD in a secret account.",
+    "I need ONLY your bank details, SSN, and mother maiden",
+    "name to transfer this fortune. You keep 40% dear friend.",
+    "",
+    "Please reply with urgency. God bless you abundantly.",
+    "",
+    "— H.R.H Prince Adewale Okonkwo III 👑",
   ];
 
+  // Phase 1: Type the subject line
   useEffect(() => {
+    if (phase !== "email") return;
     let i = 0;
-    const delays = [0, 300, 600, 950, 1250, 2050, 2300, 2600, 3100];
+    const timer = setInterval(() => {
+      setTypedSubject(subject.slice(0, i + 1));
+      i++;
+      if (i >= subject.length) {
+        clearInterval(timer);
+        // Start typing body after subject done
+        let bi = 0;
+        let lineIndex = 0;
+        let charIndex = 0;
+        const bodyTimer = setInterval(() => {
+          const currentLine = body[lineIndex];
+          if (charIndex <= currentLine.length) {
+            setTypedBody(
+              body.slice(0, lineIndex).join("\n") +
+                "\n" +
+                currentLine.slice(0, charIndex),
+            );
+            charIndex++;
+          } else {
+            lineIndex++;
+            charIndex = 0;
+            if (lineIndex >= body.length) {
+              clearInterval(bodyTimer);
+              setTimeout(() => setPhase("scan"), 800);
+            }
+          }
+          bi++;
+        }, 22);
+      }
+    }, 28);
+    return () => clearInterval(timer);
+  }, [phase]);
 
-    const timers = bootLines.map((line, index) =>
+  // Phase 2: Scan lines appear
+  useEffect(() => {
+    if (phase !== "scan") return;
+    const lines = [
+      { text: "> INCOMING EMAIL DETECTED...", color: "#c8ffd6", delay: 0 },
+      {
+        text: "> SCANNING SENDER: prince.adewale@totally-real-nigeria.com",
+        color: "#ffbe00",
+        delay: 350,
+      },
+      {
+        text: "> DOMAIN AGE: 3 days  ⚠ SUSPICIOUS",
+        color: "#ffbe00",
+        delay: 700,
+      },
+      { text: "> ANALYZING SUBJECT LINE...", color: "#c8ffd6", delay: 1050 },
+      {
+        text: "> DETECTED: ALL CAPS + EXCESSIVE MONEY PROMISES",
+        color: "#ff4444",
+        delay: 1400,
+      },
+      {
+        text: "> CHECKING CONTENT... NIGERIAN PRINCE PROTOCOL v4.2",
+        color: "#ff4444",
+        delay: 1750,
+      },
+      {
+        text: "> THREAT LEVEL: 😂 MAXIMUM ABSURDITY",
+        color: "#ff4444",
+        delay: 2100,
+      },
+      {
+        text: "> VERDICT: THIS IS OBVIOUSLY FAKE LOL",
+        color: "#ff4444",
+        delay: 2450,
+      },
+    ];
+
+    lines.forEach(({ text, color, delay }) => {
       setTimeout(() => {
-        setLines((prev) => [...prev, line]);
-      }, delays[index]),
-    );
+        setScanLines((prev) => [...prev, { text, color }]);
+        setProgress(
+          Math.round(
+            ((lines.findIndex((l) => l.text === text) + 1) / lines.length) * 70,
+          ),
+        );
+      }, delay);
+    });
 
-    const exitTimer = setTimeout(() => {
+    setTimeout(() => setPhase("blocked"), 2900);
+  }, [phase]);
+
+  // Phase 3: BLOCKED flash then boot
+  useEffect(() => {
+    if (phase !== "blocked") return;
+    setProgress(80);
+    setTimeout(() => setPhase("boot"), 1800);
+  }, [phase]);
+
+  // Phase 4: Boot lines
+  useEffect(() => {
+    if (phase !== "boot") return;
+    const lines = [
+      {
+        text: "> THREAT NEUTRALIZED. PRINCE ADEWALE HAS BEEN DENIED.",
+        color: "#00ff88",
+        delay: 0,
+      },
+      {
+        text: "> YOUR $10,000,000 IS SAFE (it was never real anyway).",
+        color: "#4d7a5e",
+        delay: 400,
+      },
+      { text: "> LOADING PHISHPEACE...", color: "#00ff88", delay: 800 },
+      { text: "> ALL SYSTEMS NOMINAL", color: "#00ff88", delay: 1100 },
+    ];
+
+    lines.forEach(({ text, color, delay }) => {
+      setTimeout(() => {
+        setBootLines((prev) => [...prev, { text, color }]);
+        setProgress(
+          80 +
+            Math.round(
+              ((lines.findIndex((l) => l.text === text) + 1) / lines.length) *
+                20,
+            ),
+        );
+      }, delay);
+    });
+
+    setTimeout(() => {
       setVisible(false);
-      setTimeout(onDone, 600);
-    }, 3200);
-
-    return () => {
-      timers.forEach(clearTimeout);
-      clearTimeout(exitTimer);
-    };
-  }, []);
+      setTimeout(onDone, 700);
+    }, 2200);
+  }, [phase]);
 
   return (
     <div
@@ -1071,7 +1191,8 @@ function LoadingScreen({ onDone }) {
         justifyContent: "center",
         fontFamily: "'Share Tech Mono', monospace",
         opacity: visible ? 1 : 0,
-        transition: "opacity 0.6s ease",
+        transition: "opacity 0.7s ease",
+        padding: "1rem",
       }}
     >
       {/* Scanlines overlay */}
@@ -1079,34 +1200,37 @@ function LoadingScreen({ onDone }) {
         style={{
           position: "absolute",
           inset: 0,
+          pointerEvents: "none",
           background:
             "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,100,0.015) 2px, rgba(0,255,100,0.015) 4px)",
-          pointerEvents: "none",
         }}
       />
 
       {/* Logo */}
       <div
         style={{
-          fontSize: "clamp(1.4rem, 5vw, 2.2rem)",
+          fontSize: "clamp(1.2rem, 4vw, 1.9rem)",
           color: "#00ff88",
           letterSpacing: "6px",
-          textShadow: "0 0 30px #00ff88, 0 0 60px rgba(0,255,136,0.3)",
-          marginBottom: "2.5rem",
           fontWeight: "bold",
+          marginBottom: "1.5rem",
+          textShadow: "0 0 30px #00ff88",
         }}
       >
         [PHISH<span style={{ color: "#00e5ff" }}>PEACE</span>]
       </div>
 
-      {/* Terminal box */}
+      {/* Main box */}
       <div
         style={{
-          width: "min(560px, 90vw)",
+          width: "min(600px, 95vw)",
           background: "#071210",
-          border: "1px solid #163024",
+          border: `1px solid ${phase === "blocked" ? "rgba(255,68,68,0.6)" : "#163024"}`,
           borderRadius: "8px",
           overflow: "hidden",
+          transition: "border-color 0.3s ease",
+          boxShadow:
+            phase === "blocked" ? "0 0 40px rgba(255,68,68,0.2)" : "none",
         }}
       >
         {/* Titlebar */}
@@ -1120,93 +1244,235 @@ function LoadingScreen({ onDone }) {
             gap: "0.6rem",
           }}
         >
-          <span
-            style={{
-              width: 11,
-              height: 11,
-              borderRadius: "50%",
-              background: "#ff5f57",
-              display: "inline-block",
-            }}
-          />
-          <span
-            style={{
-              width: 11,
-              height: 11,
-              borderRadius: "50%",
-              background: "#ffbd2e",
-              display: "inline-block",
-            }}
-          />
-          <span
-            style={{
-              width: 11,
-              height: 11,
-              borderRadius: "50%",
-              background: "#28c840",
-              display: "inline-block",
-            }}
-          />
+          {["#ff5f57", "#ffbd2e", "#28c840"].map((c) => (
+            <span
+              key={c}
+              style={{
+                width: 11,
+                height: 11,
+                borderRadius: "50%",
+                background: c,
+                display: "inline-block",
+              }}
+            />
+          ))}
           <span
             style={{
               fontSize: "0.7rem",
               color: "#4d7a5e",
-              marginLeft: "0.5rem",
+              marginLeft: "0.4rem",
               letterSpacing: "1px",
             }}
           >
-            phishpeace — boot_sequence.sh
+            {phase === "email" || phase === "scan"
+              ? "📧 inbox — 1 new message"
+              : phase === "blocked"
+                ? "🚫 threat_blocked.sh"
+                : "phishpeace — boot.sh"}
           </span>
         </div>
 
-        {/* Terminal lines */}
-        <div style={{ padding: "1.25rem 1.5rem", minHeight: "200px" }}>
-          {lines.map((line, i) => {
-            const isOK = line.includes("[OK]");
-            const isLast = i === lines.length - 1;
-            return (
+        <div style={{ padding: "1rem 1.25rem", minHeight: "220px" }}>
+          {/* Phase: Email display */}
+          {(phase === "email" || phase === "scan") && (
+            <div>
+              {/* Email header */}
               <div
-                key={i}
                 style={{
-                  fontSize: "0.82rem",
-                  lineHeight: "1.9",
-                  color: isOK
-                    ? "#4d7a5e"
-                    : line.includes("LAUNCHING") || line.includes("NOMINAL")
-                      ? "#00ff88"
-                      : "#c8ffd6",
+                  borderBottom: "1px solid #163024",
+                  paddingBottom: "0.6rem",
+                  marginBottom: "0.75rem",
                 }}
               >
-                {line}
-                {isOK && (
-                  <span style={{ color: "#00ff88", marginLeft: "4px" }}>✓</span>
-                )}
-                {isLast && !isOK && (
+                <div style={{ fontSize: "0.7rem", marginBottom: "0.25rem" }}>
+                  <span style={{ color: "#4d7a5e" }}>FROM: </span>
+                  <span style={{ color: "#ffbe00" }}>
+                    prince.adewale@totally-real-nigeria.com
+                  </span>
+                </div>
+                <div style={{ fontSize: "0.7rem", marginBottom: "0.25rem" }}>
+                  <span style={{ color: "#4d7a5e" }}>TO: </span>
+                  <span style={{ color: "#c8ffd6" }}>you@youremail.com</span>
+                </div>
+                <div
+                  style={{
+                    fontSize: "0.7rem",
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: "0.4rem",
+                    alignItems: "center",
+                  }}
+                >
+                  <span style={{ color: "#4d7a5e" }}>SUBJ: </span>
+                  <span style={{ color: "#ffbe00" }}>{typedSubject}</span>
+                  {phase === "email" &&
+                    typedSubject.length < subject.length && (
+                      <span
+                        style={{
+                          background: "#ffbe00",
+                          width: "8px",
+                          height: "14px",
+                          display: "inline-block",
+                          verticalAlign: "middle",
+                          animation: "blink 0.8s step-end infinite",
+                        }}
+                      />
+                    )}
+                </div>
+              </div>
+
+              {/* Email body */}
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  color: "#c8ffd6",
+                  lineHeight: "1.8",
+                  whiteSpace: "pre-wrap",
+                  minHeight: "100px",
+                }}
+              >
+                {typedBody}
+                {phase === "email" && typedSubject.length >= subject.length && (
                   <span
                     style={{
+                      background: "#c8ffd6",
+                      width: "7px",
+                      height: "13px",
                       display: "inline-block",
-                      width: "8px",
-                      height: "14px",
-                      background: "#00ff88",
-                      marginLeft: "4px",
                       verticalAlign: "middle",
-                      animation: "blink 1s step-end infinite",
+                      animation: "blink 0.8s step-end infinite",
                     }}
                   />
                 )}
               </div>
-            );
-          })}
+
+              {/* Scan lines appearing over email */}
+              {phase === "scan" && scanLines.length > 0 && (
+                <div
+                  style={{
+                    marginTop: "0.75rem",
+                    borderTop: "1px solid #163024",
+                    paddingTop: "0.75rem",
+                  }}
+                >
+                  {scanLines.map((line, i) => (
+                    <div
+                      key={i}
+                      style={{
+                        fontSize: "0.72rem",
+                        color: line.color,
+                        lineHeight: "1.9",
+                        animation: "fadeIn 0.3s ease",
+                      }}
+                    >
+                      {line.text}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Phase: BLOCKED */}
+          {phase === "blocked" && (
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: "200px",
+                gap: "1rem",
+                animation: "fadeIn 0.3s ease",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: "clamp(2.5rem, 8vw, 4rem)",
+                  fontWeight: "900",
+                  color: "#ff4444",
+                  letterSpacing: "8px",
+                  border: "3px solid #ff4444",
+                  padding: "0.3rem 1.5rem",
+                  borderRadius: "4px",
+                  textShadow: "0 0 30px rgba(255,68,68,0.8)",
+                  boxShadow: "0 0 40px rgba(255,68,68,0.2)",
+                  animation: "stampIn 0.3s ease",
+                }}
+              >
+                BLOCKED
+              </div>
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  color: "#ff4444",
+                  letterSpacing: "2px",
+                  textAlign: "center",
+                }}
+              >
+                ⚠ PHISHING ATTEMPT DETECTED
+              </div>
+              <div
+                style={{
+                  fontSize: "0.68rem",
+                  color: "#4d7a5e",
+                  textAlign: "center",
+                  lineHeight: "1.8",
+                  maxWidth: "340px",
+                }}
+              >
+                Sorry Prince Adewale — your $10M offer
+                <br />
+                has been <span style={{ color: "#ff4444" }}>DENIED</span> 😂
+                <br />
+                <span style={{ color: "#2a4a35" }}>
+                  Better luck next time (please don't try again)
+                </span>
+              </div>
+            </div>
+          )}
+
+          {/* Phase: Boot */}
+          {phase === "boot" && (
+            <div>
+              {bootLines.map((line, i) => (
+                <div
+                  key={i}
+                  style={{
+                    fontSize: "0.78rem",
+                    color: line.color,
+                    lineHeight: "2",
+                    animation: "fadeIn 0.3s ease",
+                  }}
+                >
+                  {line.text}
+                  {i === bootLines.length - 1 && (
+                    <span
+                      style={{
+                        background: line.color,
+                        width: "8px",
+                        height: "14px",
+                        display: "inline-block",
+                        verticalAlign: "middle",
+                        marginLeft: "4px",
+                        animation: "blink 1s step-end infinite",
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Progress bar */}
       <div
         style={{
-          width: "min(560px, 90vw)",
+          width: "min(600px, 95vw)",
           height: "2px",
           background: "#163024",
-          marginTop: "1.5rem",
+          marginTop: "1rem",
           borderRadius: "2px",
           overflow: "hidden",
         }}
@@ -1214,23 +1480,45 @@ function LoadingScreen({ onDone }) {
         <div
           style={{
             height: "100%",
-            background: "#00ff88",
-            boxShadow: "0 0 8px #00ff88",
-            width: `${(lines.length / bootLines.length) * 100}%`,
-            transition: "width 0.3s ease",
+            background:
+              phase === "blocked"
+                ? "#ff4444"
+                : phase === "boot"
+                  ? "#00ff88"
+                  : "#00e5ff",
+            boxShadow: `0 0 8px ${phase === "blocked" ? "#ff4444" : phase === "boot" ? "#00ff88" : "#00e5ff"}`,
+            width: `${progress}%`,
+            transition: "width 0.4s ease, background 0.3s ease",
           }}
         />
       </div>
       <div
         style={{
-          fontSize: "0.68rem",
+          fontSize: "0.65rem",
           color: "#4d7a5e",
-          marginTop: "0.5rem",
+          marginTop: "0.4rem",
           letterSpacing: "1px",
         }}
       >
-        {Math.round((lines.length / bootLines.length) * 100)}% LOADED
+        {phase === "email"
+          ? "READING SUSPICIOUS EMAIL..."
+          : phase === "scan"
+            ? "ANALYZING THREAT..."
+            : phase === "blocked"
+              ? "THREAT NEUTRALIZED"
+              : "LAUNCHING PHISHPEACE..."}
       </div>
+
+      <style>{`
+        @keyframes stampIn {
+          from { opacity: 0; transform: scale(1.5) rotate(-3deg); }
+          to   { opacity: 1; transform: scale(1) rotate(-3deg); }
+        }
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(6px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
