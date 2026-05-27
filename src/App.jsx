@@ -1023,160 +1023,101 @@ function AboutPage() {
 }
 function LoadingScreen({ onDone }) {
   const [visible, setVisible] = useState(true);
-  const [phase, setPhase] = useState("email"); // "email" | "scan" | "blocked" | "boot"
-  const [scanLines, setScanLines] = useState([]);
+  const [frame, setFrame] = useState(0);
+  const [reelProgress, setReelProgress] = useState(0);
+  const [phase, setPhase] = useState("fishing"); // "fishing" | "hooked" | "reeling" | "caught" | "boot"
   const [bootLines, setBootLines] = useState([]);
-  const [typedSubject, setTypedSubject] = useState("");
-  const [typedBody, setTypedBody] = useState("");
-  const [progress, setProgress] = useState(0);
+  const [bobOffset, setBobOffset] = useState(0);
 
-  const subject =
-    "URGENT CONFIDENTIAL: $10,000,000 Transfer — Need Your Help Dear Friend";
-  const body = [
-    "Dear Beloved Friend,",
-    "",
-    "I am Prince Adewale Okonkwo of Nigeria. My late father",
-    "the King has left $10,000,000 USD in a secret account.",
-    "I need ONLY your bank details, SSN, and mother maiden",
-    "name to transfer this fortune. You keep 40% dear friend.",
-    "",
-    "Please reply with urgency. God bless you abundantly.",
-    "",
-    "— H.R.H Prince Adewale Okonkwo III 👑",
+  // Fish swimming frames
+  const fishFrames = [
+    "><(((º>",
+    "><((( º>",
+    " ><(((º>",
+    "  ><(((º>",
+    "   ><(((º>",
+    "  ><(((º>",
+    " ><(((º>",
+    "><(((º>",
   ];
 
-  // Phase 1: Type the subject line
+  // Hook frames
+  const hookFrames = ["J", "J.", "J..", "J..."];
+
+  // Bobber bob animation
   useEffect(() => {
-    if (phase !== "email") return;
-    let i = 0;
+    if (phase !== "fishing") return;
+    let t = 0;
     const timer = setInterval(() => {
-      setTypedSubject(subject.slice(0, i + 1));
-      i++;
-      if (i >= subject.length) {
-        clearInterval(timer);
-        // Start typing body after subject done
-        let bi = 0;
-        let lineIndex = 0;
-        let charIndex = 0;
-        const bodyTimer = setInterval(() => {
-          const currentLine = body[lineIndex];
-          if (charIndex <= currentLine.length) {
-            setTypedBody(
-              body.slice(0, lineIndex).join("\n") +
-                "\n" +
-                currentLine.slice(0, charIndex),
-            );
-            charIndex++;
-          } else {
-            lineIndex++;
-            charIndex = 0;
-            if (lineIndex >= body.length) {
-              clearInterval(bodyTimer);
-              setTimeout(() => setPhase("scan"), 800);
-            }
-          }
-          bi++;
-        }, 22);
-      }
-    }, 28);
+      setBobOffset(Math.sin(t) * 3);
+      t += 0.15;
+    }, 50);
     return () => clearInterval(timer);
   }, [phase]);
 
-  // Phase 2: Scan lines appear
+  // Fish swimming animation
   useEffect(() => {
-    if (phase !== "scan") return;
-    const lines = [
-      { text: "> INCOMING EMAIL DETECTED...", color: "#c8ffd6", delay: 0 },
-      {
-        text: "> SCANNING SENDER: prince.adewale@totally-real-nigeria.com",
-        color: "#ffbe00",
-        delay: 350,
-      },
-      {
-        text: "> DOMAIN AGE: 3 days  ⚠ SUSPICIOUS",
-        color: "#ffbe00",
-        delay: 700,
-      },
-      { text: "> ANALYZING SUBJECT LINE...", color: "#c8ffd6", delay: 1050 },
-      {
-        text: "> DETECTED: ALL CAPS + EXCESSIVE MONEY PROMISES",
-        color: "#ff4444",
-        delay: 1400,
-      },
-      {
-        text: "> CHECKING CONTENT... NIGERIAN PRINCE PROTOCOL v4.2",
-        color: "#ff4444",
-        delay: 1750,
-      },
-      {
-        text: "> THREAT LEVEL: 😂 MAXIMUM ABSURDITY",
-        color: "#ff4444",
-        delay: 2100,
-      },
-      {
-        text: "> VERDICT: THIS IS OBVIOUSLY FAKE LOL",
-        color: "#ff4444",
-        delay: 2450,
-      },
-    ];
-
-    lines.forEach(({ text, color, delay }) => {
-      setTimeout(() => {
-        setScanLines((prev) => [...prev, { text, color }]);
-        setProgress(
-          Math.round(
-            ((lines.findIndex((l) => l.text === text) + 1) / lines.length) * 70,
-          ),
-        );
-      }, delay);
-    });
-
-    setTimeout(() => setPhase("blocked"), 2900);
+    if (phase !== "fishing") return;
+    const timer = setInterval(() => {
+      setFrame((f) => (f + 1) % fishFrames.length);
+    }, 180);
+    return () => clearInterval(timer);
   }, [phase]);
 
-  // Phase 3: BLOCKED flash then boot
+  // Phase timeline
   useEffect(() => {
-    if (phase !== "blocked") return;
-    setProgress(80);
-    setTimeout(() => setPhase("boot"), 1800);
-  }, [phase]);
+    // 1.5s - fish gets hooked
+    const t1 = setTimeout(() => setPhase("hooked"), 1500);
 
-  // Phase 4: Boot lines
+    // 2.2s - start reeling
+    const t2 = setTimeout(() => setPhase("reeling"), 2200);
+
+    // Reel progress
+    const t3 = setTimeout(() => {
+      let p = 0;
+      const reel = setInterval(() => {
+        p += 2;
+        setReelProgress(p);
+        if (p >= 100) clearInterval(reel);
+      }, 40);
+    }, 2200);
+
+    // 4.8s - caught!
+    const t4 = setTimeout(() => setPhase("caught"), 4800);
+
+    // 5.6s - boot sequence
+    const t5 = setTimeout(() => setPhase("boot"), 5600);
+
+    return () => [t1, t2, t3, t4, t5].forEach(clearTimeout);
+  }, []);
+
+  // Boot lines
   useEffect(() => {
     if (phase !== "boot") return;
     const lines = [
       {
-        text: "> THREAT NEUTRALIZED. PRINCE ADEWALE HAS BEEN DENIED.",
+        text: "> One fish successfully phished 🎣",
         color: "#00ff88",
         delay: 0,
       },
-      {
-        text: "> YOUR $10,000,000 IS SAFE (it was never real anyway).",
-        color: "#4d7a5e",
-        delay: 400,
-      },
-      { text: "> LOADING PHISHPEACE...", color: "#00ff88", delay: 800 },
-      { text: "> ALL SYSTEMS NOMINAL", color: "#00ff88", delay: 1100 },
+      { text: "> Phishing awareness: ACTIVATED", color: "#00ff88", delay: 400 },
+      { text: "> Loading PhishPeace...", color: "#c8ffd6", delay: 800 },
+      { text: "> Stay safe out there!", color: "#00ff88", delay: 1200 },
     ];
-
     lines.forEach(({ text, color, delay }) => {
-      setTimeout(() => {
-        setBootLines((prev) => [...prev, { text, color }]);
-        setProgress(
-          80 +
-            Math.round(
-              ((lines.findIndex((l) => l.text === text) + 1) / lines.length) *
-                20,
-            ),
-        );
-      }, delay);
+      setTimeout(
+        () => setBootLines((prev) => [...prev, { text, color }]),
+        delay,
+      );
     });
-
     setTimeout(() => {
       setVisible(false);
       setTimeout(onDone, 700);
-    }, 2200);
+    }, 2400);
   }, [phase]);
+
+  const waterLine = "≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈";
+  const deepWater = "~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~";
 
   return (
     <div
@@ -1193,9 +1134,10 @@ function LoadingScreen({ onDone }) {
         opacity: visible ? 1 : 0,
         transition: "opacity 0.7s ease",
         padding: "1rem",
+        userSelect: "none",
       }}
     >
-      {/* Scanlines overlay */}
+      {/* Scanlines */}
       <div
         style={{
           position: "absolute",
@@ -1213,24 +1155,35 @@ function LoadingScreen({ onDone }) {
           color: "#00ff88",
           letterSpacing: "6px",
           fontWeight: "bold",
-          marginBottom: "1.5rem",
+          marginBottom: "0.25rem",
           textShadow: "0 0 30px #00ff88",
         }}
       >
         [PHISH<span style={{ color: "#00e5ff" }}>PEACE</span>]
       </div>
-
-      {/* Main box */}
       <div
         style={{
-          width: "min(600px, 95vw)",
+          fontSize: "0.62rem",
+          color: "#4d7a5e",
+          letterSpacing: "3px",
+          marginBottom: "1.75rem",
+        }}
+      >
+        {phase === "fishing" && "CASTING LINE..."}
+        {phase === "hooked" && "SOMETHING'S BITING..."}
+        {phase === "reeling" && "REELING IT IN..."}
+        {phase === "caught" && "GOT ONE! 🎉"}
+        {phase === "boot" && "LAUNCHING PHISHPEACE..."}
+      </div>
+
+      {/* ASCII Scene Box */}
+      <div
+        style={{
+          width: "min(540px, 95vw)",
           background: "#071210",
-          border: `1px solid ${phase === "blocked" ? "rgba(255,68,68,0.6)" : "#163024"}`,
+          border: "1px solid #163024",
           borderRadius: "8px",
           overflow: "hidden",
-          transition: "border-color 0.3s ease",
-          boxShadow:
-            phase === "blocked" ? "0 0 40px rgba(255,68,68,0.2)" : "none",
         }}
       >
         {/* Titlebar */}
@@ -1264,117 +1217,286 @@ function LoadingScreen({ onDone }) {
               letterSpacing: "1px",
             }}
           >
-            {phase === "email" || phase === "scan"
-              ? "📧 inbox — 1 new message"
-              : phase === "blocked"
-                ? "🚫 threat_blocked.sh"
-                : "phishpeace — boot.sh"}
+            🎣 phishpeace — fishing_simulator.sh
           </span>
         </div>
 
-        <div style={{ padding: "1rem 1.25rem", minHeight: "220px" }}>
-          {/* Phase: Email display */}
-          {(phase === "email" || phase === "scan") && (
-            <div>
-              {/* Email header */}
+        {/* ASCII art area */}
+        <div style={{ padding: "1.25rem 1.5rem", minHeight: "260px" }}>
+          {/* ── FISHING / HOOKED PHASE ── */}
+          {(phase === "fishing" || phase === "hooked") && (
+            <div style={{ lineHeight: "1.6" }}>
+              {/* Rod & person */}
               <div
                 style={{
-                  borderBottom: "1px solid #163024",
-                  paddingBottom: "0.6rem",
-                  marginBottom: "0.75rem",
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#c8ffd6",
+                  whiteSpace: "pre",
                 }}
               >
-                <div style={{ fontSize: "0.7rem", marginBottom: "0.25rem" }}>
-                  <span style={{ color: "#4d7a5e" }}>FROM: </span>
-                  <span style={{ color: "#ffbe00" }}>
-                    prince.adewale@totally-real-nigeria.com
-                  </span>
-                </div>
-                <div style={{ fontSize: "0.7rem", marginBottom: "0.25rem" }}>
-                  <span style={{ color: "#4d7a5e" }}>TO: </span>
-                  <span style={{ color: "#c8ffd6" }}>you@youremail.com</span>
-                </div>
-                <div
-                  style={{
-                    fontSize: "0.7rem",
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: "0.4rem",
-                    alignItems: "center",
-                  }}
-                >
-                  <span style={{ color: "#4d7a5e" }}>SUBJ: </span>
-                  <span style={{ color: "#ffbe00" }}>{typedSubject}</span>
-                  {phase === "email" &&
-                    typedSubject.length < subject.length && (
-                      <span
-                        style={{
-                          background: "#ffbe00",
-                          width: "8px",
-                          height: "14px",
-                          display: "inline-block",
-                          verticalAlign: "middle",
-                          animation: "blink 0.8s step-end infinite",
-                        }}
-                      />
-                    )}
-                </div>
+                {"    o        🎣"}
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#c8ffd6",
+                  whiteSpace: "pre",
+                }}
+              >
+                {"   /|\\      /"}
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#c8ffd6",
+                  whiteSpace: "pre",
+                }}
+              >
+                {"   / \\     /"}
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#4d7a5e",
+                  whiteSpace: "pre",
+                }}
+              >
+                {"___________/___________________________"}
               </div>
 
-              {/* Email body */}
+              {/* Fishing line going down */}
               <div
                 style={{
-                  fontSize: "0.75rem",
-                  color: "#c8ffd6",
-                  lineHeight: "1.8",
-                  whiteSpace: "pre-wrap",
-                  minHeight: "100px",
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#4d7a5e",
+                  whiteSpace: "pre",
+                  marginLeft: "19ch",
+                  transform: `translateY(${bobOffset}px)`,
+                  transition: "transform 0.05s",
                 }}
               >
-                {typedBody}
-                {phase === "email" && typedSubject.length >= subject.length && (
+                {"  |"}
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#4d7a5e",
+                  whiteSpace: "pre",
+                  marginLeft: "19ch",
+                  transform: `translateY(${bobOffset}px)`,
+                  transition: "transform 0.05s",
+                }}
+              >
+                {"  |"}
+              </div>
+
+              {/* Bobber */}
+              <div
+                style={{
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  whiteSpace: "pre",
+                  marginLeft: "19ch",
+                  transform: `translateY(${bobOffset}px)`,
+                  transition: "transform 0.05s",
+                }}
+              >
+                <span style={{ color: "#ff4444" }}>{"  o"}</span>
+                {phase === "hooked" && (
                   <span
                     style={{
-                      background: "#c8ffd6",
-                      width: "7px",
-                      height: "13px",
-                      display: "inline-block",
-                      verticalAlign: "middle",
-                      animation: "blink 0.8s step-end infinite",
+                      color: "#ffbe00",
+                      animation: "blink 0.3s step-end infinite",
                     }}
-                  />
+                  >
+                    {" !!!"}
+                  </span>
                 )}
               </div>
 
-              {/* Scan lines appearing over email */}
-              {phase === "scan" && scanLines.length > 0 && (
-                <div
-                  style={{
-                    marginTop: "0.75rem",
-                    borderTop: "1px solid #163024",
-                    paddingTop: "0.75rem",
-                  }}
-                >
-                  {scanLines.map((line, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        fontSize: "0.72rem",
-                        color: line.color,
-                        lineHeight: "1.9",
-                        animation: "fadeIn 0.3s ease",
-                      }}
-                    >
-                      {line.text}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {/* Water surface */}
+              <div
+                style={{
+                  fontSize: "clamp(0.65rem, 1.8vw, 0.8rem)",
+                  color: "#00e5ff",
+                  opacity: 0.5,
+                  whiteSpace: "pre",
+                  marginTop: "2px",
+                }}
+              >
+                {waterLine}
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(0.65rem, 1.8vw, 0.8rem)",
+                  color: "#00e5ff",
+                  opacity: 0.25,
+                  whiteSpace: "pre",
+                }}
+              >
+                {deepWater}
+              </div>
+
+              {/* Fish swimming */}
+              <div
+                style={{
+                  fontSize: "clamp(0.75rem, 2.2vw, 0.95rem)",
+                  color: phase === "hooked" ? "#ff4444" : "#00ff88",
+                  whiteSpace: "pre",
+                  marginTop: "6px",
+                  animation:
+                    phase === "hooked" ? "shake 0.15s infinite" : "none",
+                  textShadow:
+                    phase === "hooked"
+                      ? "0 0 10px rgba(255,68,68,0.6)"
+                      : "0 0 8px rgba(0,255,136,0.4)",
+                }}
+              >
+                {phase === "hooked"
+                  ? "  >°))))彡  ← HOOKED!"
+                  : `  ${fishFrames[frame]}`}
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(0.65rem, 1.8vw, 0.8rem)",
+                  color: "#00e5ff",
+                  opacity: 0.15,
+                  whiteSpace: "pre",
+                  marginTop: "4px",
+                }}
+              >
+                {deepWater}
+              </div>
             </div>
           )}
 
-          {/* Phase: BLOCKED */}
-          {phase === "blocked" && (
+          {/* ── REELING PHASE ── */}
+          {phase === "reeling" && (
+            <div style={{ lineHeight: "1.6" }}>
+              <div
+                style={{
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#c8ffd6",
+                  whiteSpace: "pre",
+                }}
+              >
+                {"    o        🎣"}
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#c8ffd6",
+                  whiteSpace: "pre",
+                }}
+              >
+                {"   /|\\      /"}
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#c8ffd6",
+                  whiteSpace: "pre",
+                }}
+              >
+                {"   / \\     /"}
+              </div>
+              <div
+                style={{
+                  fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                  color: "#4d7a5e",
+                  whiteSpace: "pre",
+                }}
+              >
+                {"___________/___________________________"}
+              </div>
+
+              {/* Shortened line based on progress */}
+              {reelProgress < 60 && (
+                <div
+                  style={{
+                    fontSize: "clamp(0.7rem, 2vw, 0.85rem)",
+                    color: "#4d7a5e",
+                    whiteSpace: "pre",
+                    marginLeft: "19ch",
+                  }}
+                >
+                  {"  |"}
+                </div>
+              )}
+
+              {/* Fish being reeled - moves up */}
+              <div
+                style={{
+                  fontSize: "clamp(0.75rem, 2.2vw, 0.95rem)",
+                  color: "#ffbe00",
+                  whiteSpace: "pre",
+                  marginTop:
+                    reelProgress < 40
+                      ? "20px"
+                      : reelProgress < 70
+                        ? "10px"
+                        : "2px",
+                  marginLeft: `${Math.max(0, 12 - Math.floor(reelProgress / 10))}ch`,
+                  transition: "margin 0.4s ease",
+                  textShadow: "0 0 10px rgba(255,190,0,0.5)",
+                  animation: "shake 0.2s infinite",
+                }}
+              >
+                {reelProgress < 70 ? ">°))))彡~" : ">°))))彡~ ← ALMOST GOT IT!"}
+              </div>
+
+              <div
+                style={{
+                  fontSize: "clamp(0.65rem, 1.8vw, 0.8rem)",
+                  color: "#00e5ff",
+                  opacity: 0.5,
+                  whiteSpace: "pre",
+                  marginTop: "8px",
+                }}
+              >
+                {waterLine}
+              </div>
+
+              {/* Reel progress bar */}
+              <div style={{ marginTop: "1rem" }}>
+                <div
+                  style={{
+                    fontSize: "0.65rem",
+                    color: "#4d7a5e",
+                    letterSpacing: "1px",
+                    marginBottom: "0.3rem",
+                  }}
+                >
+                  REEL TENSION: {reelProgress}%
+                </div>
+                <div
+                  style={{
+                    height: "4px",
+                    background: "#163024",
+                    borderRadius: "2px",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      height: "100%",
+                      width: `${reelProgress}%`,
+                      background:
+                        reelProgress > 80
+                          ? "#ff4444"
+                          : reelProgress > 50
+                            ? "#ffbe00"
+                            : "#00e5ff",
+                      boxShadow: `0 0 6px ${reelProgress > 80 ? "#ff4444" : reelProgress > 50 ? "#ffbe00" : "#00e5ff"}`,
+                      transition: "width 0.1s ease, background 0.3s ease",
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── CAUGHT PHASE ── */}
+          {phase === "caught" && (
             <div
               style={{
                 display: "flex",
@@ -1382,59 +1504,73 @@ function LoadingScreen({ onDone }) {
                 alignItems: "center",
                 justifyContent: "center",
                 minHeight: "200px",
-                gap: "1rem",
-                animation: "fadeIn 0.3s ease",
+                gap: "0.75rem",
+                animation: "fadeIn 0.4s ease",
               }}
             >
               <div
                 style={{
-                  fontSize: "clamp(2.5rem, 8vw, 4rem)",
-                  fontWeight: "900",
-                  color: "#ff4444",
-                  letterSpacing: "8px",
-                  border: "3px solid #ff4444",
-                  padding: "0.3rem 1.5rem",
-                  borderRadius: "4px",
-                  textShadow: "0 0 30px rgba(255,68,68,0.8)",
-                  boxShadow: "0 0 40px rgba(255,68,68,0.2)",
-                  animation: "stampIn 0.3s ease",
+                  fontSize: "clamp(1.8rem, 6vw, 3rem)",
+                  animation: "bounce 0.5s ease infinite alternate",
                 }}
               >
-                BLOCKED
+                🎣
               </div>
               <div
                 style={{
-                  fontSize: "0.75rem",
-                  color: "#ff4444",
-                  letterSpacing: "2px",
-                  textAlign: "center",
+                  fontSize: "clamp(0.9rem, 3vw, 1.3rem)",
+                  color: "#00ff88",
+                  letterSpacing: "4px",
+                  fontWeight: "bold",
+                  textShadow: "0 0 20px rgba(0,255,136,0.6)",
                 }}
               >
-                ⚠ PHISHING ATTEMPT DETECTED
+                PHISH CAUGHT!
               </div>
               <div
                 style={{
-                  fontSize: "0.68rem",
+                  fontSize: "clamp(1.2rem, 4vw, 2rem)",
+                  color: "#ffbe00",
+                  whiteSpace: "pre",
+                  textShadow: "0 0 10px rgba(255,190,0,0.5)",
+                }}
+              >
+                {"    >°))))彡"}
+              </div>
+              <div
+                style={{
+                  fontSize: "0.72rem",
                   color: "#4d7a5e",
                   textAlign: "center",
                   lineHeight: "1.8",
-                  maxWidth: "340px",
                 }}
               >
-                Sorry Prince Adewale — your $10M offer
+                <span style={{ color: "#00ff88" }}>SPECIES:</span> Suspiciousus
+                Emailicus
                 <br />
-                has been <span style={{ color: "#ff4444" }}>DENIED</span> 😂
+                <span style={{ color: "#00ff88" }}>SIZE:</span> Dangerously
+                Large
                 <br />
-                <span style={{ color: "#2a4a35" }}>
-                  Better luck next time (please don't try again)
+                <span style={{ color: "#00ff88" }}>VERDICT:</span>{" "}
+                <span style={{ color: "#ff4444" }}>
+                  THROW IT BACK (and report it)
                 </span>
               </div>
             </div>
           )}
 
-          {/* Phase: Boot */}
+          {/* ── BOOT PHASE ── */}
           {phase === "boot" && (
             <div>
+              <div
+                style={{
+                  fontSize: "0.75rem",
+                  color: "#4d7a5e",
+                  marginBottom: "0.5rem",
+                }}
+              >
+                {">"} Phish successfully identified and discarded.
+              </div>
               {bootLines.map((line, i) => (
                 <div
                   key={i}
@@ -1466,10 +1602,10 @@ function LoadingScreen({ onDone }) {
         </div>
       </div>
 
-      {/* Progress bar */}
+      {/* Bottom progress bar */}
       <div
         style={{
-          width: "min(600px, 95vw)",
+          width: "min(540px, 95vw)",
           height: "2px",
           background: "#163024",
           marginTop: "1rem",
@@ -1481,38 +1617,36 @@ function LoadingScreen({ onDone }) {
           style={{
             height: "100%",
             background:
-              phase === "blocked"
-                ? "#ff4444"
-                : phase === "boot"
-                  ? "#00ff88"
+              phase === "caught" || phase === "boot"
+                ? "#00ff88"
+                : phase === "reeling"
+                  ? "#ffbe00"
                   : "#00e5ff",
-            boxShadow: `0 0 8px ${phase === "blocked" ? "#ff4444" : phase === "boot" ? "#00ff88" : "#00e5ff"}`,
-            width: `${progress}%`,
+            boxShadow: `0 0 8px ${phase === "caught" || phase === "boot" ? "#00ff88" : "#00e5ff"}`,
+            width:
+              phase === "fishing"
+                ? "15%"
+                : phase === "hooked"
+                  ? "30%"
+                  : phase === "reeling"
+                    ? `${30 + reelProgress * 0.4}%`
+                    : phase === "caught"
+                      ? "85%"
+                      : "100%",
             transition: "width 0.4s ease, background 0.3s ease",
           }}
         />
       </div>
-      <div
-        style={{
-          fontSize: "0.65rem",
-          color: "#4d7a5e",
-          marginTop: "0.4rem",
-          letterSpacing: "1px",
-        }}
-      >
-        {phase === "email"
-          ? "READING SUSPICIOUS EMAIL..."
-          : phase === "scan"
-            ? "ANALYZING THREAT..."
-            : phase === "blocked"
-              ? "THREAT NEUTRALIZED"
-              : "LAUNCHING PHISHPEACE..."}
-      </div>
 
       <style>{`
-        @keyframes stampIn {
-          from { opacity: 0; transform: scale(1.5) rotate(-3deg); }
-          to   { opacity: 1; transform: scale(1) rotate(-3deg); }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25%       { transform: translateX(-2px) rotate(-1deg); }
+          75%       { transform: translateX(2px) rotate(1deg); }
+        }
+        @keyframes bounce {
+          from { transform: translateY(0); }
+          to   { transform: translateY(-8px); }
         }
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(6px); }
