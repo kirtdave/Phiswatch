@@ -1026,7 +1026,7 @@ function LoadingScreen({ onDone }) {
 
   useEffect(() => {
     let i = 0;
-    const delays = [0, 500, 900, 1350, 1750, 2050, 2300, 2600, 3000];
+    const delays = [0, 300, 600, 950, 1250, 1550, 1800, 2100, 2500];
 
     const timers = bootLines.map((line, index) =>
       setTimeout(() => {
