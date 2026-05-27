@@ -850,7 +850,7 @@ function DiscussionPage() {
             <div className="email-field">
               <span className="ef-label">Subject:</span>
               <span className="ef-danger">
-                URGENT CONFIDENTIAL: $10,000,000 Transfer — Need Your Help Dear
+                URGENT CONFIDENTIAL: $10,000,000 Transfer. Need Your Help Dear
                 Friend
               </span>
               <span className="ef-tag ef-orange">
