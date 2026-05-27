@@ -496,6 +496,382 @@ function AnimatedStat({ num, label, trigger }) {
     </div>
   );
 }
+function QuizSection() {
+  const questions = [
+    {
+      id: 1,
+      email: {
+        from: "security@paypa1-alerts.com",
+        subject: "URGENT: Your account has been suspended",
+        body: "Click here immediately to verify your identity or your account will be permanently closed within 24 hours.",
+      },
+      isPhishing: true,
+      clues: [
+        "Misspelled domain: 'paypa1' not 'paypal'",
+        "Urgency + fear trigger",
+        "Threatens permanent consequence",
+      ],
+    },
+    {
+      id: 2,
+      email: {
+        from: "no-reply@github.com",
+        subject: "Your pull request #482 was merged",
+        body: "Hi there, your pull request 'Fix login bug' was successfully merged into main by a collaborator.",
+      },
+      isPhishing: false,
+      clues: [
+        "Legitimate GitHub domain",
+        "No links or urgency",
+        "Routine notification with no action required",
+      ],
+    },
+    {
+      id: 3,
+      email: {
+        from: "hr-department@your-company-inc.net",
+        subject: "Important: Update your direct deposit info",
+        body: "Due to a system migration, all employees must re-enter their banking details via the link below before Friday.",
+      },
+      isPhishing: true,
+      clues: [
+        "Third-party domain, not a real company domain",
+        "Requests sensitive financial data",
+        "Artificial deadline creates panic",
+      ],
+    },
+    {
+      id: 4,
+      email: {
+        from: "noreply@amazon.com",
+        subject: "Your order #112-3456789 has shipped",
+        body: "Your package is on its way! Estimated delivery: Thursday. Track your package in the Amazon app.",
+      },
+      isPhishing: false,
+      clues: [
+        "Legitimate Amazon domain",
+        "No sensitive info requested",
+        "Standard shipping notification",
+      ],
+    },
+    {
+      id: 5,
+      email: {
+        from: "irs-refund@tax-gov-refunds.com",
+        subject: "You are owed a $1,240.00 tax refund",
+        body: "The IRS has determined you are owed a refund. Provide your SSN and bank account to claim it within 48 hours.",
+      },
+      isPhishing: true,
+      clues: [
+        "Fake domain — IRS only uses irs.gov",
+        "Requests SSN and banking info",
+        "Money promise + urgency = classic bait",
+      ],
+    },
+  ];
+
+  const [current, setCurrent] = useState(0);
+  const [answered, setAnswered] = useState(null); // null | true | false
+  const [score, setScore] = useState(0);
+  const [done, setDone] = useState(false);
+
+  const q = questions[current];
+
+  const answer = (guess) => {
+    if (answered !== null) return;
+    const correct = guess === q.isPhishing;
+    setAnswered(correct);
+    if (correct) setScore((s) => s + 1);
+  };
+
+  const next = () => {
+    if (current + 1 >= questions.length) {
+      setDone(true);
+    } else {
+      setCurrent((c) => c + 1);
+      setAnswered(null);
+    }
+  };
+
+  const restart = () => {
+    setCurrent(0);
+    setAnswered(null);
+    setScore(0);
+    setDone(false);
+  };
+
+  if (done) {
+    const pct = Math.round((score / questions.length) * 100);
+    return (
+      <div
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius)",
+          padding: "2rem",
+          textAlign: "center",
+        }}
+      >
+        <div style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>
+          {pct >= 80 ? "🛡️" : pct >= 60 ? "⚠️" : "🎣"}
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--mono)",
+            fontSize: "0.72rem",
+            letterSpacing: "2px",
+            color: "var(--accent)",
+            marginBottom: "0.5rem",
+          }}
+        >
+          QUIZ COMPLETE
+        </div>
+        <div
+          style={{
+            fontFamily: "var(--head)",
+            fontSize: "2.5rem",
+            fontWeight: 700,
+            color: "var(--green)",
+            marginBottom: "0.25rem",
+          }}
+        >
+          {score}/{questions.length}
+        </div>
+        <div
+          style={{
+            fontSize: "0.85rem",
+            color: "var(--text-dim)",
+            marginBottom: "1.5rem",
+          }}
+        >
+          {pct >= 80
+            ? "Excellent — you'd make a great security analyst."
+            : pct >= 60
+              ? "Not bad, but a determined attacker might still fool you."
+              : "Careful — you're a phisher's dream target. Study up!"}
+        </div>
+        <button className="btn-primary" onClick={restart}>
+          Try Again
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        background: "var(--surface)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--radius)",
+        overflow: "hidden",
+      }}
+    >
+      {/* Progress bar */}
+      <div style={{ height: "2px", background: "var(--border)" }}>
+        <div
+          style={{
+            height: "100%",
+            background: "var(--green)",
+            width: `${(current / questions.length) * 100}%`,
+            transition: "width 0.4s ease",
+          }}
+        />
+      </div>
+
+      <div style={{ padding: "1.25rem" }}>
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "1rem",
+          }}
+        >
+          <span
+            style={{
+              fontFamily: "var(--mono)",
+              fontSize: "0.68rem",
+              letterSpacing: "2px",
+              color: "var(--accent)",
+            }}
+          >
+            SPOT THE PHISH — {current + 1}/{questions.length}
+          </span>
+          <span
+            style={{
+              fontFamily: "var(--mono)",
+              fontSize: "0.7rem",
+              color: "var(--text-dim)",
+            }}
+          >
+            Score: {score}
+          </span>
+        </div>
+
+        {/* Email mock */}
+        <div className="email-mock" style={{ marginBottom: "1rem" }}>
+          <div className="email-titlebar">
+            <div className="email-dots">
+              <span style={{ background: "#ff5f57" }}></span>
+              <span style={{ background: "#ffbd2e" }}></span>
+              <span style={{ background: "#28c840" }}></span>
+            </div>
+            <span className="email-titlebar-text">
+              📧 Inbox — Is this safe?
+            </span>
+          </div>
+          <div className="email-body">
+            <div className="email-field">
+              <span className="ef-label">From:</span>
+              <span
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: "0.8rem",
+                  color: "var(--text)",
+                }}
+              >
+                {q.email.from}
+              </span>
+            </div>
+            <div className="email-field">
+              <span className="ef-label">Subject:</span>
+              <span
+                style={{
+                  fontFamily: "var(--mono)",
+                  fontSize: "0.8rem",
+                  color: "var(--text)",
+                }}
+              >
+                {q.email.subject}
+              </span>
+            </div>
+            <div className="email-hr"></div>
+            <div className="email-content">
+              <p>{q.email.body}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Buttons */}
+        {answered === null && (
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <button
+              onClick={() => answer(true)}
+              style={{
+                flex: 1,
+                padding: "0.75rem",
+                background: "rgba(255,68,68,0.1)",
+                border: "1px solid rgba(255,68,68,0.35)",
+                borderRadius: "var(--radius)",
+                color: "#ff4444",
+                fontFamily: "var(--head)",
+                fontSize: "0.9rem",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              🎣 PHISHING
+            </button>
+            <button
+              onClick={() => answer(false)}
+              style={{
+                flex: 1,
+                padding: "0.75rem",
+                background: "rgba(0,255,136,0.07)",
+                border: "1px solid rgba(0,255,136,0.25)",
+                borderRadius: "var(--radius)",
+                color: "var(--green)",
+                fontFamily: "var(--head)",
+                fontSize: "0.9rem",
+                fontWeight: 700,
+                letterSpacing: "1px",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+            >
+              ✅ LEGITIMATE
+            </button>
+          </div>
+        )}
+
+        {/* Result */}
+        {answered !== null && (
+          <div
+            style={{
+              background: answered
+                ? "rgba(0,255,136,0.05)"
+                : "rgba(255,68,68,0.07)",
+              border: `1px solid ${answered ? "var(--green-dk)" : "rgba(255,68,68,0.3)"}`,
+              borderRadius: "var(--radius)",
+              padding: "1rem",
+              marginTop: "0.25rem",
+            }}
+          >
+            <div
+              style={{
+                fontFamily: "var(--head)",
+                fontWeight: 700,
+                fontSize: "0.9rem",
+                color: answered ? "var(--green)" : "#ff4444",
+                marginBottom: "0.5rem",
+                letterSpacing: "1px",
+              }}
+            >
+              {answered ? "✓ CORRECT" : "✗ WRONG"} — This email is{" "}
+              {q.isPhishing ? "PHISHING" : "LEGITIMATE"}
+            </div>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.3rem",
+              }}
+            >
+              {q.clues.map((clue, i) => (
+                <div
+                  key={i}
+                  style={{
+                    fontSize: "0.82rem",
+                    color: "var(--text-dim)",
+                    display: "flex",
+                    gap: "0.5rem",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: q.isPhishing ? "#ff4444" : "var(--green)",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {q.isPhishing ? "⚠" : "✓"}
+                  </span>
+                  {clue}
+                </div>
+              ))}
+            </div>
+            <button
+              className="btn-primary"
+              onClick={next}
+              style={{
+                marginTop: "1rem",
+                padding: "0.5rem 1.25rem",
+                fontSize: "0.82rem",
+              }}
+            >
+              {current + 1 >= questions.length
+                ? "See Results →"
+                : "Next Email →"}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Home Page ────────────────────────────────────────────────────────────────
 function HomePage({ setActive, booting }) {
   return (
@@ -963,6 +1339,20 @@ function DiscussionPage() {
             </div>
           </div>
         </div>
+      </section>
+      <section className="section">
+        <h2 className="section-title">Test Your Skills</h2>
+        <p
+          style={{
+            color: "var(--text-dim)",
+            fontSize: "0.9rem",
+            marginBottom: "1.5rem",
+          }}
+        >
+          Can you tell a real email from a phishing attempt? Judge these 5
+          emails.
+        </p>
+        <QuizSection />
       </section>
     </div>
   );
@@ -1689,7 +2079,7 @@ export function ToastNotification() {
     requestAnimationFrame(() =>
       requestAnimationFrame(() => setAnimClass("show")),
     );
-    autoRef.current = setTimeout(hideToast, 6000);
+    autoRef.current = setTimeout(hideToast, 8000);
   };
 
   const hideToast = () => {
@@ -1743,7 +2133,7 @@ export function ToastNotification() {
           animation: none;
         }
         .toast-notify.show .toast-bar-fill {
-          animation: toast-drain 6s linear forwards;
+          animation: toast-drain 8s linear forwards;
         }
         @keyframes toast-dot-blink {
           0%,100% { opacity:1; } 50% { opacity:0.25; }
