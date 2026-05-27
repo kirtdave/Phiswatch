@@ -360,7 +360,7 @@ function NavBar({ active, setActive }) {
       <div className="nav-inner">
         <button className="nav-logo" onClick={() => handleNav("Home")}>
           <span className="logo-bracket">[</span>
-          PHISH<span className="logo-accent">WATCH</span>
+          PHISH<span className="logo-accent">PEACE</span>
           <span className="logo-bracket">]</span>
         </button>
         <ul className="nav-links-desktop">
@@ -410,7 +410,7 @@ function Footer({ setActive }) {
       <div className="footer-inner">
         <div className="footer-brand">
           <span className="logo-bracket">[</span>PHISH
-          <span className="logo-accent">WATCH</span>
+          <span className="logo-accent">PEACE</span>
           <span className="logo-bracket">]</span>
           <p>
             A cybersecurity awareness project focused on understanding and
@@ -439,7 +439,7 @@ function Footer({ setActive }) {
         </div>
       </div>
       <div className="footer-bottom">
-        <span>© 2025 PhishWatch — Cybersecurity Awareness Project</span>
+        <span>© 2025 PhishPeace — Cybersecurity Awareness Project</span>
         <span className="footer-tag">// STAY VIGILANT. STAY SAFE.</span>
       </div>
     </footer>
@@ -1026,7 +1026,7 @@ function LoadingScreen({ onDone }) {
   const [visible, setVisible] = useState(true);
 
   const bootLines = [
-    "> INITIALIZING PHISHWATCH v2.4.1...",
+    "> INITIALIZING PHISHPEACE ...",
     "> LOADING THREAT DATABASE............[OK]",
     "> SCANNING NETWORK INTERFACES........[OK]",
     "> ESTABLISHING SECURE CONNECTION.....[OK]",
@@ -1096,7 +1096,7 @@ function LoadingScreen({ onDone }) {
           fontWeight: "bold",
         }}
       >
-        [PHISH<span style={{ color: "#00e5ff" }}>WATCH</span>]
+        [PHISH<span style={{ color: "#00e5ff" }}>PEACE</span>]
       </div>
 
       {/* Terminal box */}
@@ -1155,7 +1155,7 @@ function LoadingScreen({ onDone }) {
               letterSpacing: "1px",
             }}
           >
-            phishwatch — boot_sequence.sh
+            phishpeace — boot_sequence.sh
           </span>
         </div>
 
