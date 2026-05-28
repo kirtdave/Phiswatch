@@ -439,7 +439,7 @@ function Footer({ setActive }) {
         </div>
       </div>
       <div className="footer-bottom">
-        <span>© 2025 PhishPeace — Cybersecurity Awareness Project</span>
+        <span>© 2026 PhishPeace — Cybersecurity Awareness Project</span>
         <span className="footer-tag">// STAY VIGILANT. STAY SAFE.</span>
       </div>
     </footer>
