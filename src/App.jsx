@@ -1851,19 +1851,29 @@ function LoadingScreen({ onDone }) {
                   marginBottom: "0.75rem",
                 }}
               >
-                <div style={{ fontSize: "0.7rem", marginBottom: "0.25rem" }}>
+                <div
+                  style={{
+                    fontSize: "clamp(0.55rem, 2.2vw, 0.7rem)",
+                    marginBottom: "0.25rem",
+                  }}
+                >
                   <span style={{ color: "#4d7a5e" }}>FROM: </span>
                   <span style={{ color: "#ffbe00" }}>
                     prince.adewale@totally-real-nigeria.com
                   </span>
                 </div>
-                <div style={{ fontSize: "0.7rem", marginBottom: "0.25rem" }}>
+                <div
+                  style={{
+                    fontSize: "clamp(0.55rem, 2.2vw, 0.7rem)",
+                    marginBottom: "0.25rem",
+                  }}
+                >
                   <span style={{ color: "#4d7a5e" }}>TO: </span>
                   <span style={{ color: "#c8ffd6" }}>davekirt7@gmail.com</span>
                 </div>
                 <div
                   style={{
-                    fontSize: "0.7rem",
+                    fontSize: "clamp(0.55rem, 2.2vw, 0.7rem)",
                     display: "flex",
                     flexWrap: "wrap",
                     gap: "0.4rem",
@@ -1891,9 +1901,9 @@ function LoadingScreen({ onDone }) {
               {/* Email body */}
               <div
                 style={{
-                  fontSize: "0.75rem",
+                  fontSize: "clamp(0.55rem, 2.5vw, 0.75rem)",
                   color: "#c8ffd6",
-                  lineHeight: "1.8",
+                  lineHeight: "1.6",
                   whiteSpace: "pre-wrap",
                   minHeight: "100px",
                 }}
@@ -1926,7 +1936,7 @@ function LoadingScreen({ onDone }) {
                     <div
                       key={i}
                       style={{
-                        fontSize: "0.72rem",
+                        fontSize: "clamp(0.5rem, 2vw, 0.72rem)",
                         color: line.color,
                         lineHeight: "1.9",
                         animation: "fadeIn 0.3s ease",
@@ -1971,7 +1981,7 @@ function LoadingScreen({ onDone }) {
               </div>
               <div
                 style={{
-                  fontSize: "0.75rem",
+                  fontSize: "clamp(0.55rem, 2vw, 0.75rem)",
                   color: "#ff4444",
                   letterSpacing: "2px",
                   textAlign: "center",
@@ -1981,7 +1991,7 @@ function LoadingScreen({ onDone }) {
               </div>
               <div
                 style={{
-                  fontSize: "0.68rem",
+                  fontSize: "clamp(0.5rem, 1.8vw, 0.68rem)",
                   color: "#4d7a5e",
                   textAlign: "center",
                   lineHeight: "1.8",
@@ -2006,7 +2016,7 @@ function LoadingScreen({ onDone }) {
                 <div
                   key={i}
                   style={{
-                    fontSize: "0.78rem",
+                    fontSize: "clamp(0.55rem, 2.2vw, 0.78rem)",
                     color: line.color,
                     lineHeight: "2",
                     animation: "fadeIn 0.3s ease",
@@ -2061,7 +2071,7 @@ function LoadingScreen({ onDone }) {
       </div>
       <div
         style={{
-          fontSize: "0.65rem",
+          fontSize: "clamp(0.5rem, 1.8vw, 0.65rem)",
           color: "#4d7a5e",
           marginTop: "0.4rem",
           letterSpacing: "1px",
